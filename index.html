@@ -884,6 +884,60 @@
     .loader { display: inline-block; width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* CLIENTS CARTERA & QUOTES */
+    .clients-grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1rem; }
+    .client-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1.15rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .client-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--primary); }
+    .client-status-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.2rem 0.55rem;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .status-quote { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+    [data-theme="dark"] .status-quote { background: #1e3a8a; color: #93c5fd; border-color: #3b82f6; }
+    .status-closed { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    [data-theme="dark"] .status-closed { background: #064e3b; color: #6ee7b7; border-color: #10b981; }
+    .status-recurring { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+    [data-theme="dark"] .status-recurring { background: #581c87; color: #d8b4fe; border-color: #a855f7; }
+
+    .container-order-box {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem;
+      margin: 0.65rem 0;
+    }
+    .container-spec-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 0.25rem;
+    }
+    .container-price-tag {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     /* ==========================================
        RESPONSIVE CSS (MOBILE & TABLET ADAPTATION)
        ========================================== */
@@ -973,6 +1027,14 @@
               <span>Deals Pipeline</span>
             </div>
             <span class="nav-badge" id="nav-badge-pipeline">0</span>
+          </button>
+
+          <button class="nav-item" id="nav-btn-clients" onclick="switchNavTab('clients-view')">
+            <div class="nav-item-left">
+              <span class="nav-item-icon">💼</span>
+              <span>Cartera de Clientes</span>
+            </div>
+            <span class="nav-badge" style="background:#dcfce7;color:#15803d;" id="nav-badge-clients">0</span>
           </button>
 
           <button class="nav-item" id="nav-btn-calendar" onclick="switchNavTab('calendar-view')">
@@ -1241,6 +1303,159 @@
               <div class="column-cards-wrap" id="cards-cerrado"></div>
             </div>
           </div>
+        </div>
+
+        <!-- ==========================================
+             TAB: CARTERA DE CLIENTES & COTIZACIONES
+             ========================================== -->
+        <div class="app-tab-pane" id="clients-view">
+          
+          <div class="page-title-row">
+            <div>
+              <h1>💼 Cartera de Clientes & Cotizaciones</h1>
+              <p>Directorio de clientes calificados, cotizaciones aprobadas y compras de contenedores en Florida.</p>
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+              <button class="btn-new-lead" style="background:#10b981;" onclick="openClientModal(null, null)">➕ Nuevo Cliente / Cotización</button>
+              <button class="btn-new-lead" style="background:var(--card-bg);border:1.5px solid var(--border);color:var(--text-main);" onclick="exportClientsCSV()">📥 Exportar CSV</button>
+            </div>
+          </div>
+
+          <!-- KPI Metric Cards for Clients -->
+          <div class="kpi-row">
+            <div class="kpi-card">
+              <div class="kpi-card-title">
+                <span>Clientes Calificados</span>
+                <span>💼</span>
+              </div>
+              <div class="kpi-values-grid">
+                <div>
+                  <div class="kpi-sub-label">Cartera Activa</div>
+                  <div class="kpi-sub-val" id="kpi-client-count" style="color:var(--primary);">0</div>
+                  <div class="kpi-sub-trend">Compradores / Cotizados</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-card-title">
+                <span>Contenedores Totales</span>
+                <span>📦</span>
+              </div>
+              <div class="kpi-values-grid">
+                <div>
+                  <div class="kpi-sub-label">Unidades en Venta/Alquiler</div>
+                  <div class="kpi-sub-val" id="kpi-client-containers" style="color:var(--purple);">0</div>
+                  <div class="kpi-sub-trend">20ft / 40ft / 45ft</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-card-title">
+                <span>Facturación / Cotizado ($)</span>
+                <span>💰</span>
+              </div>
+              <div class="kpi-values-grid">
+                <div>
+                  <div class="kpi-sub-label">Valor Acumulado</div>
+                  <div class="kpi-sub-val" id="kpi-client-revenue" style="color:var(--success);">$0</div>
+                  <div class="kpi-sub-trend">Ventas & Cotizaciones</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-card-title">
+                <span>Entregas en Florida</span>
+                <span>🚚</span>
+              </div>
+              <div class="kpi-values-grid">
+                <div>
+                  <div class="kpi-sub-label">Despachos & Logística</div>
+                  <div class="kpi-sub-val" id="kpi-client-deliveries" style="color:#d97706;">0</div>
+                  <div class="kpi-sub-trend">Tilt-Bed / Flatbed 24-48h</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Toolbar for Clients -->
+          <div class="toolbar-row">
+            <div class="toolbar-left">
+              <div class="view-toggle-wrap">
+                <button class="btn-toggle-view active" id="btn-client-view-grid" onclick="toggleClientViewMode('grid')" title="Vista Tarjetas">📇 Tarjetas</button>
+                <button class="btn-toggle-view" id="btn-client-view-table" onclick="toggleClientViewMode('table')" title="Vista Tabla">📋 Tabla</button>
+              </div>
+
+              <input type="text" id="filter-client-search" class="top-search-input" style="width:220px;padding-left:0.75rem;" placeholder="Buscar cliente, contacto, tel..." oninput="renderClients()">
+
+              <select id="filter-client-status" class="filter-select" onchange="renderClients()">
+                <option value="all">⭐ Todos los Estados</option>
+                <option value="Cotización Activa">📄 Cotización Activa</option>
+                <option value="Venta Cerrada">🎉 Venta Cerrada / Pagada</option>
+                <option value="Cliente Recurrente">🔄 Cliente Recurrente</option>
+              </select>
+
+              <select id="filter-client-city" class="filter-select" onchange="renderClients()">
+                <option value="all">📍 Todas las Ciudades</option>
+                <option value="Naples">Naples (Collier County)</option>
+                <option value="Lehigh Acres">Lehigh Acres (Lee County)</option>
+                <option value="Clewiston">Clewiston (Hendry County)</option>
+                <option value="Montura Ranches">Montura Ranches / Clewiston (Hendry County)</option>
+                <option value="West Palm Beach">West Palm Beach (Palm Beach County)</option>
+                <option value="Loxahatchee">Loxahatchee (Palm Beach County)</option>
+                <option value="Florida Keys">Cayos de Florida (Key West, Key Largo, Marathon)</option>
+                <option value="Stuart">Stuart (Martin County)</option>
+                <option value="Jupiter">Jupiter (Palm Beach County)</option>
+                <option value="Lake Worth">Lake Worth Beach (Palm Beach County)</option>
+                <option value="Boca Raton">Boca Raton (Palm Beach County)</option>
+                <option value="Boynton Beach">Boynton Beach (Palm Beach County)</option>
+                <option value="Homestead">Homestead / Redland (Miami-Dade)</option>
+                <option value="Miami">Miami (Doral / Medley / Centro)</option>
+                <option value="Hialeah">Hialeah (Miami-Dade)</option>
+                <option value="Doral">Doral (Carga & Logística)</option>
+                <option value="Fort Lauderdale">Fort Lauderdale / Broward</option>
+                <option value="Pompano Beach">Pompano Beach (Broward)</option>
+                <option value="Orlando">Orlando / Orange County</option>
+                <option value="Tampa">Tampa / Hillsborough</option>
+                <option value="Ocala">Ocala / Marion (Ranchos y Terrenos)</option>
+                <option value="Fort Myers">Fort Myers / Lee</option>
+              </select>
+
+              <select id="filter-client-type" class="filter-select" onchange="renderClients()">
+                <option value="all">📦 Todos los Tamaños</option>
+                <option value="20ft Standard">20ft Standard</option>
+                <option value="40ft Standard">40ft Standard</option>
+                <option value="40ft High Cube">40ft High Cube</option>
+                <option value="45ft High Cube">45ft High Cube</option>
+                <option value="Chassis">Chassis Porta-Contenedor</option>
+                <option value="Oficina / Modificado">Oficina / Modificado</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- VISTA 1: GRID DE CLIENTES -->
+          <div class="clients-grid-layout" id="clients-grid"></div>
+
+          <!-- VISTA 2: TABLA DE CLIENTES -->
+          <div class="leads-table-container" id="clients-table-wrap" style="display:none;margin-top:0.75rem;">
+            <table class="leads-table">
+              <thead>
+                <tr>
+                  <th>Empresa & Decisor</th>
+                  <th>Teléfono & Email</th>
+                  <th>Ciudad & Entrega</th>
+                  <th>Pedido / Contenedor</th>
+                  <th>Valor Total</th>
+                  <th>Estado</th>
+                  <th style="text-align:right;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="clients-table-body"></tbody>
+            </table>
+          </div>
+
         </div>
 
         <!-- ==========================================
@@ -1717,6 +1932,184 @@
     </div>
   </div>
 
+  <!-- MODAL FICHA DE CLIENTE / CONVERSIÓN -->
+  <div class="modal-overlay" id="client-modal">
+    <div class="modal" style="max-width:750px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.65rem;">
+        <div>
+          <h3 id="client-modal-title" style="margin-bottom:0.25rem;color:var(--primary);font-size:1.2rem;">💼 Ficha del Cliente & Cotización</h3>
+          <p style="font-size:0.8rem;color:var(--text-muted);">Registra los detalles comerciales, tipo de contenedor y logística de entrega en Florida.</p>
+        </div>
+        <button onclick="closeModal('client-modal')" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#94a3b8;">&times;</button>
+      </div>
+      
+      <form onsubmit="handleSaveClient(event)">
+        <input type="hidden" id="client-id">
+        <input type="hidden" id="client-lead-id">
+
+        <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
+          <div>
+            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">EMPRESA / RAZÓN SOCIAL *</label>
+            <input type="text" id="client-business" class="top-search-input" style="border-radius:8px;padding-left:0.75rem;" required placeholder="Ej. Apex Construction Group LLC">
+          </div>
+          <div>
+            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">TAX ID / EIN (Opcional)</label>
+            <input type="text" id="client-taxid" class="top-search-input" style="border-radius:8px;padding-left:0.75rem;" placeholder="Ej. 12-3456789">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
+          <div>
+            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">NOMBRE DEL CONTACTO / DECISOR</label>
+            <input type="text" id="client-contact" class="top-search-input" style="border-radius:8px;padding-left:0.75rem;" placeholder="Ej. Carlos Rodriguez">
+          </div>
+          <div>
+            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">CARGO / ROL</label>
+            <input type="text" id="client-role" class="top-search-input" style="border-radius:8px;padding-left:0.75rem;" placeholder="Ej. Gerente de Compras / Dueño">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
+          <div>
+            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">TELÉFONO / WHATSAPP *</label>
+            <input type="text" id="client-phone" class="top-search-input" style="border-radius:8px;padding-left:0.75rem;" required placeholder="Ej. (786) 555-1234">
+          </div>
+          <div>
+            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">CORREO ELECTRÓNICO</label>
+            <input type="email" id="client-email" class="top-search-input" style="border-radius:8px;padding-left:0.75rem;" placeholder="Ej. compras@empresa.com">
+          </div>
+        </div>
+
+        <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:12px;padding:0.85rem;margin-bottom:0.85rem;">
+          <div style="font-size:0.75rem;font-weight:800;color:var(--primary);margin-bottom:0.65rem;text-transform:uppercase;">📦 DETALLES DEL CONTENEDOR & PEDIDO:</div>
+          
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.65rem;margin-bottom:0.65rem;">
+            <div>
+              <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);">TAMAÑO / TIPO *</label>
+              <select id="client-container-type" class="filter-select" style="width:100%;padding:0.5rem;" required>
+                <option value="20ft Standard">20ft Standard (20'x8'x8'6")</option>
+                <option value="40ft Standard">40ft Standard (40'x8'x8'6")</option>
+                <option value="40ft High Cube" selected>40ft High Cube (40'x8'x9'6")</option>
+                <option value="45ft High Cube">45ft High Cube (45'x8'x9'6")</option>
+                <option value="Chassis">Chassis Porta-Contenedor</option>
+                <option value="Oficina / Modificado">Oficina / Modificado</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);">CONDICIÓN *</label>
+              <select id="client-container-cond" class="filter-select" style="width:100%;padding:0.5rem;" required>
+                <option value="WWT (Wind & Water Tight)">WWT (Wind & Water Tight)</option>
+                <option value="Cargo Worthy (CW)" selected>Cargo Worthy (CW - Export)</option>
+                <option value="One-Trip (Nuevo)">One-Trip (Nuevo / 1 Solo Viaje)</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);">MODALIDAD *</label>
+              <select id="client-deal-type" class="filter-select" style="width:100%;padding:0.5rem;" required>
+                <option value="Venta Directa" selected>Venta Directa</option>
+                <option value="Alquiler Mensual">Alquiler Mensual</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:0.65rem;">
+            <div>
+              <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);">CANTIDAD</label>
+              <input type="number" id="client-qty" min="1" value="1" class="top-search-input" style="border-radius:8px;padding-left:0.75rem;" required>
+            </div>
+
+            <div>
+              <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);">TOTAL FACTURADO ($)</label>
+              <input type="number" id="client-amount" step="0.01" value="1500" class="top-search-input" style="border-radius:8px;padding-left:0.75rem;" required>
+            </div>
+
+            <div>
+              <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);">CUPÓN / DESCUENTO</label>
+              <select id="client-discount" class="filter-select" style="width:100%;padding:0.5rem;">
+                <option value="Ninguno">Ninguno</option>
+                <option value="DISCOUNT$300" selected>Cupón $300 OFF (Compra)</option>
+                <option value="DISCOUNT$70">Cupón $70 OFF (Alquiler)</option>
+                <option value="Especial">Descuento por Volumen</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:0.75rem;margin-bottom:0.75rem;">
+          <div>
+            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">CIUDAD EN FLORIDA *</label>
+            <select id="client-city" class="filter-select" style="width:100%;padding:0.55rem;" required>
+              <option value="Naples">Naples (Collier County)</option>
+              <option value="Lehigh Acres">Lehigh Acres (Lee County)</option>
+              <option value="Clewiston">Clewiston (Hendry County)</option>
+              <option value="Montura Ranches">Montura Ranches / Clewiston (Hendry County)</option>
+              <option value="West Palm Beach">West Palm Beach (Palm Beach County)</option>
+              <option value="Loxahatchee">Loxahatchee (Palm Beach County)</option>
+              <option value="Florida Keys">Cayos de Florida (Key West, Key Largo, Marathon)</option>
+              <option value="Stuart">Stuart (Martin County)</option>
+              <option value="Jupiter">Jupiter (Palm Beach County)</option>
+              <option value="Lake Worth">Lake Worth Beach (Palm Beach County)</option>
+              <option value="Boca Raton">Boca Raton (Palm Beach County)</option>
+              <option value="Boynton Beach">Boynton Beach (Palm Beach County)</option>
+              <option value="Homestead">Homestead / Redland (Miami-Dade)</option>
+              <option value="Miami" selected>Miami (Doral / Medley / Centro)</option>
+              <option value="Hialeah">Hialeah (Miami-Dade)</option>
+              <option value="Doral">Doral (Carga & Logística)</option>
+              <option value="Fort Lauderdale">Fort Lauderdale / Broward</option>
+              <option value="Pompano Beach">Pompano Beach (Broward)</option>
+              <option value="Orlando">Orlando / Orange County</option>
+              <option value="Tampa">Tampa / Hillsborough</option>
+              <option value="Ocala">Ocala / Marion (Ranchos y Terrenos)</option>
+              <option value="Fort Myers">Fort Myers / Lee</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">DIRECCIÓN EXACTA DE ENTREGA / OBRA</label>
+            <input type="text" id="client-address" class="top-search-input" style="border-radius:8px;padding-left:0.75rem;" placeholder="Ej. 1240 Tamiami Trail N, Obra Lote 4">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.65rem;margin-bottom:0.75rem;">
+          <div>
+            <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);">TIPO DE ENTREGA</label>
+            <select id="client-delivery-type" class="filter-select" style="width:100%;padding:0.5rem;">
+              <option value="Camión Tilt-Bed (Descarga en Sitio)" selected>Camión Tilt-Bed (Descarga)</option>
+              <option value="Camión Flatbed">Camión Flatbed</option>
+              <option value="Retiro en Patio Miami">Retiro en Patio Miami</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);">FECHA DE ENTREGA</label>
+            <input type="date" id="client-delivery-date" class="top-search-input" style="border-radius:8px;padding-left:0.5rem;">
+          </div>
+
+          <div>
+            <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);">ESTADO DEL CLIENTE *</label>
+            <select id="client-status" class="filter-select" style="width:100%;padding:0.5rem;" required>
+              <option value="Cotización Activa" selected>📄 Cotización Activa</option>
+              <option value="Venta Cerrada">🎉 Venta Cerrada / Pagada</option>
+              <option value="Cliente Recurrente">🔄 Cliente Recurrente</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">NOTAS & REQUERIMIENTOS ESPECIALES</label>
+          <textarea id="client-notes" class="top-search-input" style="height:60px;padding:0.5rem;border-radius:8px;" placeholder="Ej. Requiere entrega por la mañana, acceso amplio para camión..."></textarea>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:0.45rem;">
+          <button type="button" class="btn-new-lead" style="background:var(--border);color:var(--text-main);" onclick="closeModal('client-modal')">Cancelar</button>
+          <button type="submit" class="btn-new-lead" style="background:#10b981;">💾 Guardar Cliente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL NUEVO LEAD MANUAL -->
   <div class="modal-overlay" id="add-modal">
     <div class="modal">
@@ -1807,11 +2200,13 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let leads = [];
+    let clients = [];
     let activities = [];
     let selectedLeadIds = new Set();
     let draggedLeadId = null;
     let selectedCalendarDateStr = new Date().toISOString().slice(0, 10);
     let currentViewMode = 'grid'; // 'grid' | 'table'
+    let currentClientViewMode = 'grid'; // 'grid' | 'table'
     let currentPage = 1;
     let pageSize = 50;
     let selectedEngines = new Set(['google_maps', 'sunbiz', 'permits', 'fmc_ports', 'crawler', 'geo_osm']);
@@ -1931,6 +2326,7 @@
       document.getElementById('pin-lock-screen').style.display = 'none';
       document.getElementById('app-container').style.display = 'flex';
       loadLeadsFromSupabase();
+      loadClientsFromSupabase();
       loadActivitiesFromSupabase();
       loadDevicesTable();
     }
@@ -1947,6 +2343,10 @@
       document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       if (tabId === 'pipeline-view') document.getElementById('nav-btn-pipeline').classList.add('active');
+      else if (tabId === 'clients-view') {
+        document.getElementById('nav-btn-clients').classList.add('active');
+        renderClients();
+      }
       else if (tabId === 'calendar-view') {
         document.getElementById('nav-btn-calendar').classList.add('active');
         renderCalendarView();
@@ -1979,6 +2379,16 @@
         renderAllLeads();
         renderArchiveView();
       } catch (err) { console.error("Error loading leads:", err); }
+    }
+
+    async function loadClientsFromSupabase() {
+      try {
+        const { data, error } = await supabaseClient.from('fl_clients').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        clients = data || [];
+        updateKPIs();
+        renderClients();
+      } catch (err) { console.error("Error loading clients:", err); }
     }
 
     async function loadActivitiesFromSupabase() {
@@ -2037,7 +2447,7 @@
         }
       });
 
-      ['filter-pipe-city', 'filter-city-pool'].forEach(id => {
+      ['filter-pipe-city', 'filter-city-pool', 'filter-client-city'].forEach(id => {
         const sel = document.getElementById(id);
         if (sel) {
           const prevVal = sel.value || 'all';
@@ -2132,6 +2542,24 @@
       document.getElementById('nav-badge-pipeline').textContent = totalActivePipeline;
       document.getElementById('nav-badge-new-leads').textContent = uncontactedCount;
       document.getElementById('nav-badge-archived').textContent = archivedCount;
+
+      // KPIs de Cartera de Clientes
+      const clientCount = clients.length;
+      const totalContainers = clients.reduce((acc, c) => acc + (parseInt(c.quantity) || 1), 0);
+      const totalRevenue = clients.reduce((acc, c) => acc + (parseFloat(c.total_amount) || 0), 0);
+      const activeDeliveries = clients.filter(c => c.delivery_date && !((c.client_status || '').includes('Cerrad'))).length;
+
+      const kpiClientCount = document.getElementById('kpi-client-count');
+      if (kpiClientCount) kpiClientCount.textContent = clientCount;
+      const kpiContainers = document.getElementById('kpi-client-containers');
+      if (kpiContainers) kpiContainers.textContent = totalContainers;
+      const kpiRevenue = document.getElementById('kpi-client-revenue');
+      if (kpiRevenue) kpiRevenue.textContent = `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+      const kpiDeliveries = document.getElementById('kpi-client-deliveries');
+      if (kpiDeliveries) kpiDeliveries.textContent = activeDeliveries;
+
+      const badgeClients = document.getElementById('nav-badge-clients');
+      if (badgeClients) badgeClients.textContent = clientCount;
     }
 
     // GESTIÓN DE DESCARTE Y ARCHIVO
@@ -2740,6 +3168,9 @@ Sitio Web: https://flcontainerchassis.com/es/
             <button class="btn-action-sm btn-act-followup" onclick="openPitchModal('${lead.id}')">
               🔔 Guión Seguimiento / Contacto
             </button>
+            <button class="btn-action-sm" style="grid-column: span 2; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; font-weight:800; margin-top:0.1rem;" onclick="openClientModal('${lead.id}', null)">
+              ⭐ Ficha / Guardar en Cartera de Clientes
+            </button>
             <button class="btn-action-sm btn-act-discard" onclick="openDiscardModal('${lead.id}')">
               ❌ Descartar / No Interesado
             </button>
@@ -3272,6 +3703,364 @@ Sitio Web: https://flcontainerchassis.com/es/
       const a = document.createElement("a");
       a.href = encodeURI(csv);
       a.download = `leads_fl_containers_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // ==========================================
+    // CARTERA DE CLIENTES & COTIZACIONES ENGINE
+    // ==========================================
+    function toggleClientViewMode(mode) {
+      currentClientViewMode = mode;
+      const btnGrid = document.getElementById('btn-client-view-grid');
+      const btnTable = document.getElementById('btn-client-view-table');
+      const grid = document.getElementById('clients-grid');
+      const tableWrap = document.getElementById('clients-table-wrap');
+
+      if (btnGrid) btnGrid.classList.toggle('active', mode === 'grid');
+      if (btnTable) btnTable.classList.toggle('active', mode === 'table');
+      if (grid) grid.style.display = mode === 'grid' ? 'grid' : 'none';
+      if (tableWrap) tableWrap.style.display = mode === 'table' ? 'block' : 'none';
+      renderClients();
+    }
+
+    function renderClients() {
+      const search = (document.getElementById('filter-client-search')?.value || '').toLowerCase().trim();
+      const statusFilter = document.getElementById('filter-client-status')?.value || 'all';
+      const cityFilter = document.getElementById('filter-client-city')?.value || 'all';
+      const typeFilter = document.getElementById('filter-client-type')?.value || 'all';
+
+      const filtered = clients.filter(c => {
+        const mSearch = (
+          (c.business_name || '').toLowerCase().includes(search) ||
+          (c.contact_name || '').toLowerCase().includes(search) ||
+          (c.phone || '').includes(search) ||
+          (c.city || '').toLowerCase().includes(search) ||
+          (c.delivery_address || '').toLowerCase().includes(search)
+        );
+        const mStatus = statusFilter === 'all' || (c.client_status || '').includes(statusFilter);
+        const mCity = cityFilter === 'all' || (c.city || '').toLowerCase().includes(cityFilter.toLowerCase());
+        const mType = typeFilter === 'all' || (c.container_type || '').includes(typeFilter);
+        return mSearch && mStatus && mCity && mType;
+      });
+
+      // RENDER GRID
+      const grid = document.getElementById('clients-grid');
+      if (grid) {
+        if (!filtered.length) {
+          grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align:center; padding: 3rem 1rem; background: var(--card-bg); border: 1.5px dashed var(--border); border-radius: 16px;">
+              <span style="font-size: 2.5rem; display:block; margin-bottom: 0.5rem;">💼</span>
+              <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.35rem;">No hay clientes en esta vista</h3>
+              <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">Convierte prospectos desde el Deals Pipeline con 1 clic o registra una nueva cotización.</p>
+              <button class="btn-new-lead" style="background:#10b981;" onclick="openClientModal(null, null)">➕ Registrar Nuevo Cliente</button>
+            </div>
+          `;
+        } else {
+          grid.innerHTML = filtered.map(c => {
+            let badgeClass = 'status-quote';
+            if (c.client_status && c.client_status.includes('Cerrad')) badgeClass = 'status-closed';
+            else if (c.client_status && c.client_status.includes('Recurrente')) badgeClass = 'status-recurring';
+
+            const phoneDigits = (c.phone || '').replace(/\D/g, '');
+            const intlPhone = phoneDigits.length === 10 ? `1${phoneDigits}` : phoneDigits;
+
+            return `
+              <div class="client-card">
+                <div>
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;">
+                    <div>
+                      <span class="client-status-badge ${badgeClass}">${c.client_status || 'Cotización Activa'}</span>
+                      ${c.discount_applied && c.discount_applied !== 'Ninguno' ? `<span class="promo-chip" style="margin-left:0.25rem;">🏷️ ${c.discount_applied}</span>` : ''}
+                    </div>
+                    <span style="font-size:0.7rem;font-weight:700;color:var(--text-muted);">${c.city || 'Florida'}</span>
+                  </div>
+
+                  <h3 style="font-size:1.02rem;font-weight:800;color:var(--text-main);margin-bottom:0.15rem;">${c.business_name}</h3>
+                  <div style="font-size:0.75rem;color:var(--primary);font-weight:700;margin-bottom:0.55rem;">
+                    👤 ${c.contact_name || 'Decisor Principal'} ${c.contact_role ? `· <span style="color:var(--text-muted);">${c.contact_role}</span>` : ''}
+                  </div>
+
+                  <div class="container-order-box">
+                    <div class="container-spec-badge">📦 ${c.quantity || 1}x ${c.container_type || '40ft High Cube'} (${c.container_condition || 'Cargo Worthy'})</div>
+                    <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:0.25rem;">Modalidad: <strong>${c.deal_type || 'Venta Directa'}</strong></div>
+                    <div class="container-price-tag">
+                      <span>Total: $${(parseFloat(c.total_amount) || 0).toLocaleString('en-US', {minimumFractionDigits:2})}</span>
+                      <span style="font-size:0.68rem;font-weight:700;color:var(--text-muted);">Entrega: ${c.delivery_type ? c.delivery_type.split(' ')[0] : 'Tilt-Bed'}</span>
+                    </div>
+                  </div>
+
+                  <div style="font-size:0.72rem;color:var(--text-muted);display:flex;flex-direction:column;gap:0.2rem;margin-bottom:0.75rem;">
+                    <div>📞 <strong>${c.phone || 'Sin tel'}</strong></div>
+                    <div>📧 <strong>${c.email || 'Sin correo'}</strong></div>
+                    <div>🚚 <strong>${c.delivery_address || `${c.city || 'Miami'}, FL`}</strong></div>
+                    ${c.delivery_date ? `<div>📅 <strong>Fecha entrega: ${c.delivery_date}</strong></div>` : ''}
+                    ${c.notes ? `<div style="margin-top:0.2rem;font-style:italic;color:var(--text-main);background:rgba(0,0,0,0.03);padding:0.3rem;border-radius:6px;">📝 "${c.notes}"</div>` : ''}
+                  </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.35rem;border-top:1px solid var(--border);padding-top:0.75rem;margin-top:0.25rem;">
+                  ${c.phone ? `<button onclick="trackClientCall('${c.phone}')" class="btn-action-sm btn-act-call">📞 Llamar</button>` : ''}
+                  ${intlPhone ? `<button onclick="trackClientWhatsApp('${intlPhone}', '${c.business_name.replace(/'/g, "\\'")}')" class="btn-action-sm btn-act-wa">💬 WhatsApp</button>` : ''}
+                  <button onclick="openClientModal(null, '${c.id}')" class="btn-action-sm" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text-main);">
+                    ✏️ Editar / Ficha
+                  </button>
+                  <button onclick="deleteClient('${c.id}')" class="btn-action-sm btn-act-discard" style="grid-column:unset;margin-top:0;">
+                    🗑️ Eliminar
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      // RENDER TABLE
+      const tbody = document.getElementById('clients-table-body');
+      if (tbody) {
+        if (!filtered.length) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted);">No hay clientes registrados en esta vista.</td></tr>';
+        } else {
+          tbody.innerHTML = filtered.map(c => {
+            let badgeClass = 'status-quote';
+            if (c.client_status && c.client_status.includes('Cerrad')) badgeClass = 'status-closed';
+            else if (c.client_status && c.client_status.includes('Recurrente')) badgeClass = 'status-recurring';
+
+            const phoneDigits = (c.phone || '').replace(/\D/g, '');
+            const intlPhone = phoneDigits.length === 10 ? `1${phoneDigits}` : phoneDigits;
+
+            return `
+              <tr>
+                <td>
+                  <strong>${c.business_name}</strong><br>
+                  <span style="font-size:0.72rem;color:var(--text-muted);">${c.contact_name || 'Decisor'} ${c.contact_role ? `(${c.contact_role})` : ''}</span>
+                </td>
+                <td>
+                  <span>${c.phone || 'Sin tel'}</span><br>
+                  <span style="font-size:0.72rem;color:var(--text-muted);">${c.email || 'Sin correo'}</span>
+                </td>
+                <td>
+                  <strong>${c.city || 'Florida'}</strong><br>
+                  <span style="font-size:0.7rem;color:var(--text-muted);">${c.delivery_address || 'Entrega en sitio'}</span>
+                </td>
+                <td>
+                  <span style="font-weight:700;color:var(--primary);">${c.quantity || 1}x ${c.container_type || '40ft HC'}</span><br>
+                  <span style="font-size:0.7rem;color:var(--text-muted);">${c.container_condition || 'CW'} · ${c.deal_type || 'Venta'}</span>
+                </td>
+                <td>
+                  <strong style="font-size:0.92rem;color:var(--success);">$${(parseFloat(c.total_amount) || 0).toLocaleString('en-US', {minimumFractionDigits:2})}</strong><br>
+                  <span style="font-size:0.68rem;color:var(--text-muted);">${c.discount_applied || ''}</span>
+                </td>
+                <td>
+                  <span class="client-status-badge ${badgeClass}">${c.client_status || 'Cotización'}</span>
+                </td>
+                <td style="text-align:right;">
+                  <div style="display:inline-flex;gap:0.3rem;">
+                    ${c.phone ? `<button onclick="trackClientCall('${c.phone}')" class="btn-action-sm btn-act-call" style="padding:0.25rem 0.45rem;">📞</button>` : ''}
+                    ${intlPhone ? `<button onclick="trackClientWhatsApp('${intlPhone}', '${c.business_name.replace(/'/g, "\\'")}')" class="btn-action-sm btn-act-wa" style="padding:0.25rem 0.45rem;">💬</button>` : ''}
+                    <button onclick="openClientModal(null, '${c.id}')" class="btn-action-sm" style="background:var(--input-bg);border:1px solid var(--border);padding:0.25rem 0.45rem;">✏️</button>
+                    <button onclick="deleteClient('${c.id}')" class="btn-action-sm btn-act-discard" style="padding:0.25rem 0.45rem;margin-top:0;">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+      }
+    }
+
+    function openClientModal(leadId, clientId) {
+      document.getElementById('client-id').value = '';
+      document.getElementById('client-lead-id').value = '';
+      document.getElementById('client-business').value = '';
+      document.getElementById('client-taxid').value = '';
+      document.getElementById('client-contact').value = '';
+      document.getElementById('client-role').value = '';
+      document.getElementById('client-phone').value = '';
+      document.getElementById('client-email').value = '';
+      document.getElementById('client-city').value = 'Miami';
+      document.getElementById('client-address').value = '';
+      document.getElementById('client-container-type').value = '40ft High Cube';
+      document.getElementById('client-container-cond').value = 'Cargo Worthy (CW)';
+      document.getElementById('client-deal-type').value = 'Venta Directa';
+      document.getElementById('client-qty').value = '1';
+      document.getElementById('client-amount').value = '1500';
+      document.getElementById('client-discount').value = 'DISCOUNT$300';
+      document.getElementById('client-delivery-type').value = 'Camión Tilt-Bed (Descarga en Sitio)';
+      document.getElementById('client-delivery-date').value = '';
+      document.getElementById('client-status').value = 'Cotización Activa';
+      document.getElementById('client-notes').value = '';
+
+      if (clientId) {
+        const c = clients.find(x => x.id === clientId);
+        if (c) {
+          document.getElementById('client-modal-title').textContent = `✏️ Editar Cliente: ${c.business_name}`;
+          document.getElementById('client-id').value = c.id;
+          document.getElementById('client-lead-id').value = c.lead_id || '';
+          document.getElementById('client-business').value = c.business_name || '';
+          document.getElementById('client-taxid').value = c.tax_id || '';
+          document.getElementById('client-contact').value = c.contact_name || '';
+          document.getElementById('client-role').value = c.contact_role || '';
+          document.getElementById('client-phone').value = c.phone || '';
+          document.getElementById('client-email').value = c.email || '';
+          if (c.city) document.getElementById('client-city').value = c.city;
+          document.getElementById('client-address').value = c.delivery_address || '';
+          if (c.container_type) document.getElementById('client-container-type').value = c.container_type;
+          if (c.container_condition) document.getElementById('client-container-cond').value = c.container_condition;
+          if (c.deal_type) document.getElementById('client-deal-type').value = c.deal_type;
+          document.getElementById('client-qty').value = c.quantity || 1;
+          document.getElementById('client-amount').value = c.total_amount || 1500;
+          if (c.discount_applied) document.getElementById('client-discount').value = c.discount_applied;
+          if (c.delivery_type) document.getElementById('client-delivery-type').value = c.delivery_type;
+          document.getElementById('client-delivery-date').value = c.delivery_date || '';
+          if (c.client_status) document.getElementById('client-status').value = c.client_status;
+          document.getElementById('client-notes').value = c.notes || '';
+        }
+      } else if (leadId) {
+        const l = leads.find(x => x.id === leadId);
+        if (l) {
+          document.getElementById('client-modal-title').textContent = `⭐ Convertir Prospecto a Cliente: ${l.business_name}`;
+          document.getElementById('client-lead-id').value = l.id;
+          document.getElementById('client-business').value = l.business_name || '';
+          document.getElementById('client-contact').value = l.owner_name || '';
+          document.getElementById('client-role').value = 'Decisor / Compras';
+          document.getElementById('client-phone').value = l.phone || '';
+          document.getElementById('client-email').value = l.email || '';
+          if (l.city) document.getElementById('client-city').value = l.city;
+          document.getElementById('client-address').value = l.full_address || `${l.city || 'Miami'}, FL`;
+          document.getElementById('client-status').value = (l.contact_status && l.contact_status.includes('Cerrad')) ? 'Venta Cerrada' : 'Cotización Activa';
+        }
+      } else {
+        document.getElementById('client-modal-title').textContent = `➕ Registrar Nuevo Cliente / Cotización`;
+      }
+
+      document.getElementById('client-modal').style.display = 'flex';
+    }
+
+    async function handleSaveClient(e) {
+      e.preventDefault();
+      const id = document.getElementById('client-id').value;
+      const leadId = document.getElementById('client-lead-id').value;
+      const business = document.getElementById('client-business').value.trim();
+      const taxId = document.getElementById('client-taxid').value.trim();
+      const contact = document.getElementById('client-contact').value.trim();
+      const role = document.getElementById('client-role').value.trim();
+      const phone = document.getElementById('client-phone').value.trim();
+      const email = document.getElementById('client-email').value.trim();
+      const city = document.getElementById('client-city').value;
+      const address = document.getElementById('client-address').value.trim();
+      const containerType = document.getElementById('client-container-type').value;
+      const containerCond = document.getElementById('client-container-cond').value;
+      const dealType = document.getElementById('client-deal-type').value;
+      const qty = parseInt(document.getElementById('client-qty').value) || 1;
+      const amount = parseFloat(document.getElementById('client-amount').value) || 0;
+      const discount = document.getElementById('client-discount').value;
+      const deliveryType = document.getElementById('client-delivery-type').value;
+      const deliveryDate = document.getElementById('client-delivery-date').value;
+      const status = document.getElementById('client-status').value;
+      const notes = document.getElementById('client-notes').value.trim();
+
+      const record = {
+        lead_id: leadId || null,
+        business_name: business,
+        tax_id: taxId || null,
+        contact_name: contact || null,
+        contact_role: role || null,
+        phone: phone,
+        email: email || null,
+        city: city,
+        delivery_address: address || null,
+        container_type: containerType,
+        container_condition: containerCond,
+        deal_type: dealType,
+        quantity: qty,
+        total_amount: amount,
+        discount_applied: discount,
+        delivery_type: deliveryType,
+        delivery_date: deliveryDate || null,
+        client_status: status,
+        notes: notes || null,
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        if (id) {
+          const { error } = await supabaseClient.from('fl_clients').update(record).eq('id', id);
+          if (error) throw error;
+          const idx = clients.findIndex(x => x.id === id);
+          if (idx !== -1) clients[idx] = { ...clients[idx], ...record };
+          showToast(`¡Ficha de "${business}" actualizada! ✅`);
+        } else {
+          const { data, error } = await supabaseClient.from('fl_clients').insert([record]).select();
+          if (error) throw error;
+          if (data && data[0]) clients.unshift(data[0]);
+          await logActivity(leadId || 'manual', business, 'client_created', `Nuevo cliente guardado: ${qty}x ${containerType} ($${amount})`);
+          showToast(`🎉 ¡"${business}" guardado en Cartera de Clientes!`);
+        }
+
+        updateKPIs();
+        renderClients();
+        closeModal('client-modal');
+      } catch (err) {
+        console.error(err);
+        alert("Error al guardar cliente en Supabase: " + err.message);
+      }
+    }
+
+    async function deleteClient(clientId) {
+      const c = clients.find(x => x.id === clientId);
+      if (!c) return;
+      if (!confirm(`¿Estás seguro de eliminar a "${c.business_name}" de la Cartera de Clientes?`)) return;
+
+      try {
+        const { error } = await supabaseClient.from('fl_clients').delete().eq('id', clientId);
+        if (error) throw error;
+        clients = clients.filter(x => x.id !== clientId);
+        updateKPIs();
+        renderClients();
+        showToast(`Cliente eliminado de la cartera.`);
+      } catch (err) {
+        alert("Error al eliminar: " + err.message);
+      }
+    }
+
+    function trackClientCall(phone) {
+      window.location.href = `tel:${phone.replace(/\D/g, '')}`;
+    }
+
+    function trackClientWhatsApp(intlPhone, clientName) {
+      const msg = encodeURIComponent(`Hola buenas tardes, le saluda FL Container Chassis Miami. Le escribimos con respecto a su cotización y disponibilidad de contenedores marítimos para ${clientName}.`);
+      window.open(`https://wa.me/${intlPhone}?text=${msg}`, '_blank');
+    }
+
+    function exportClientsCSV() {
+      if (!clients.length) return alert("No hay clientes registrados en la cartera.");
+      const headers = ["Empresa", "Contacto", "Cargo", "Telefono", "Email", "TaxID", "Ciudad", "Direccion_Entrega", "Tipo_Contenedor", "Condicion", "Modalidad", "Cantidad", "Total_Facturado", "Descuento", "Tipo_Entrega", "Fecha_Entrega", "Estado", "Notas"];
+      const rows = clients.map(c => [
+        `"${(c.business_name || '').replace(/"/g, '""')}"`,
+        `"${(c.contact_name || '').replace(/"/g, '""')}"`,
+        `"${(c.contact_role || '').replace(/"/g, '""')}"`,
+        `"${(c.phone || '').replace(/"/g, '""')}"`,
+        `"${(c.email || '').replace(/"/g, '""')}"`,
+        `"${(c.tax_id || '').replace(/"/g, '""')}"`,
+        `"${(c.city || '').replace(/"/g, '""')}"`,
+        `"${(c.delivery_address || '').replace(/"/g, '""')}"`,
+        `"${(c.container_type || '').replace(/"/g, '""')}"`,
+        `"${(c.container_condition || '').replace(/"/g, '""')}"`,
+        `"${(c.deal_type || '').replace(/"/g, '""')}"`,
+        c.quantity || 1,
+        c.total_amount || 0,
+        `"${(c.discount_applied || '').replace(/"/g, '""')}"`,
+        `"${(c.delivery_type || '').replace(/"/g, '""')}"`,
+        `"${(c.delivery_date || '').replace(/"/g, '""')}"`,
+        `"${(c.client_status || '').replace(/"/g, '""')}"`,
+        `"${(c.notes || '').replace(/"/g, '""')}"`
+      ]);
+      const csv = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+      const a = document.createElement("a");
+      a.href = encodeURI(csv);
+      a.download = `clientes_fl_containers_${new Date().toISOString().slice(0,10)}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
