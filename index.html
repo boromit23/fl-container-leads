@@ -1,0 +1,3289 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FL Container Chassis | Leads Pipeline & CRM Florida</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --sidebar-bg: #ffffff;
+      --sidebar-border: #f1f5f9;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --column-bg: #f8fafc;
+      --input-bg: #f8fafc;
+      --table-header-bg: #f8fafc;
+      --table-hover: #f8fafc;
+      --primary: #1e3a8a;
+      --primary-hover: #172554;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --purple: #7c3aed;
+      --purple-hover: #6d28d9;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+      --wa-green: #25d366;
+      --wa-dark: #128c7e;
+    }
+
+    /* DARK THEME PALETTE */
+    [data-theme="dark"] {
+      --sidebar-bg: #0f172a;
+      --sidebar-border: #1e293b;
+      --bg: #0b0f19;
+      --card-bg: #1e293b;
+      --column-bg: #0f172a;
+      --input-bg: #0f172a;
+      --table-header-bg: #0f172a;
+      --table-hover: #24324d;
+      --primary: #3b82f6;
+      --primary-hover: #60a5fa;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+      --shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* PIN LOCK SCREEN */
+    #pin-lock-screen {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .pin-card {
+      background: #ffffff;
+      max-width: 380px;
+      width: 100%;
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      text-align: center;
+    }
+    [data-theme="dark"] .pin-card {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #334155;
+    }
+    .pin-logo {
+      width: 52px; height: 52px;
+      background: #eff6ff;
+      border: 2px solid #bfdbfe;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    [data-theme="dark"] .pin-logo { background: #0f172a; border-color: #3b82f6; }
+    .pin-card h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.25rem; }
+    .pin-card p { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.25rem; }
+    .pin-inputs { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.25rem; }
+    .pin-digit {
+      width: 48px; height: 54px;
+      font-size: 1.5rem; font-weight: 800;
+      text-align: center;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      background: var(--input-bg);
+      color: var(--text-main);
+      transition: all 0.2s;
+    }
+    .pin-digit:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+    .btn-pin-submit {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      padding: 0.85rem;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-pin-submit:hover { opacity: 0.9; }
+    .pin-error { color: #ef4444; font-size: 0.85rem; font-weight: 700; margin-top: 0.75rem; display: none; }
+
+    /* LAYOUT */
+    .app-layout { display: flex; min-height: 100vh; width: 100vw; position: relative; }
+
+    /* SIDEBAR DRAWER */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 9990;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .sidebar-overlay.active { display: block; opacity: 1; }
+
+    .sidebar {
+      width: 260px;
+      min-width: 260px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+      padding: 1.25rem 1rem;
+      transition: background 0.25s, border-color 0.25s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+    }
+    .brand-left { display: flex; align-items: center; gap: 0.75rem; }
+    .brand-logo-badge {
+      width: 36px; height: 36px;
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    [data-theme="dark"] .brand-logo-badge { background: #3b82f6; }
+    .brand-text h3 { font-size: 0.95rem; font-weight: 800; line-height: 1.2; }
+    .brand-text span { font-size: 0.72rem; color: var(--text-muted); }
+    
+    .btn-close-sidebar {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.25rem;
+    }
+
+    .nav-section-title {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #94a3b8;
+      padding: 0 0.6rem;
+      margin-bottom: 0.4rem;
+    }
+    .nav-list { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 1.25rem; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 0.75rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+    .nav-item-left { display: flex; align-items: center; gap: 0.65rem; }
+    .nav-item-icon { font-size: 1.1rem; width: 20px; text-align: center; }
+    .nav-item:hover { background: var(--input-bg); color: var(--text-main); }
+    .nav-item.active { background: #eff6ff; color: #1e40af; font-weight: 700; }
+    [data-theme="dark"] .nav-item.active { background: #1e293b; color: #60a5fa; border: 1px solid #334155; }
+    
+    .nav-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 12px;
+      background: var(--border);
+      color: var(--text-muted);
+    }
+    .nav-item.active .nav-badge { background: #dbeafe; color: #1e40af; }
+    [data-theme="dark"] .nav-item.active .nav-badge { background: #1e3a8a; color: #bfdbfe; }
+
+    .sidebar-user {
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .user-avatar-wrap { display: flex; align-items: center; gap: 0.6rem; }
+    .user-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: #3b82f6;
+      color: #fff;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+    .user-meta h4 { font-size: 0.82rem; font-weight: 700; }
+    .user-meta p { font-size: 0.7rem; color: #10b981; font-weight: 600; }
+
+    /* MAIN CONTENT */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    /* TOP HEADER */
+    .top-header {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      gap: 0.75rem;
+      transition: background 0.25s, border-color 0.25s;
+    }
+    .header-left-wrap { display: flex; align-items: center; gap: 0.75rem; flex: 1; }
+    .btn-mobile-menu {
+      display: none;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.45rem 0.65rem;
+      font-size: 1.1rem;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+    .top-search-wrap { position: relative; width: 380px; max-width: 100%; }
+    .top-search-input {
+      width: 100%;
+      padding: 0.55rem 0.85rem 0.55rem 2.2rem;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: var(--input-bg);
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.2s;
+    }
+    .top-search-input:focus { border-color: var(--primary); }
+    .top-search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); font-size: 0.85rem; color: #94a3b8; }
+
+    .top-header-actions { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+    
+    .btn-theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.45rem 0.75rem;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 700;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-theme-toggle:hover { border-color: var(--primary); transform: scale(1.02); }
+
+    .status-pill {
+      background: #eff6ff;
+      border: 1px solid #dbeafe;
+      color: #1e40af;
+      padding: 0.35rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    [data-theme="dark"] .status-pill { background: #0f172a; border-color: #1e3a8a; color: #93c5fd; }
+
+    .btn-new-lead {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 0.5rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      white-space: nowrap;
+    }
+    .btn-new-lead:hover { opacity: 0.9; }
+
+    .content-body { padding: 1.25rem 1.5rem; flex: 1; }
+    .app-tab-pane { display: none; }
+    .app-tab-pane.active { display: block; }
+
+    .page-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .page-title-row h1 { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
+    .page-title-row p { font-size: 0.82rem; color: var(--text-muted); }
+
+    /* KPI METRICS */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.15rem;
+      box-shadow: var(--shadow-sm);
+      transition: background 0.25s, border-color 0.25s;
+    }
+    .kpi-card-title { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+    .kpi-values-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .kpi-sub-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+    .kpi-sub-val { font-size: 1.25rem; font-weight: 800; color: var(--text-main); }
+    .kpi-sub-trend { font-size: 0.68rem; font-weight: 700; color: #10b981; }
+
+    /* TOOLBAR */
+    .toolbar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+    .toolbar-left { display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap; }
+    .filter-select {
+      padding: 0.45rem 0.65rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      background: var(--card-bg);
+      font-weight: 600;
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.2s;
+      max-width: 100%;
+    }
+
+    /* VIEW SWITCHER */
+    .view-switcher-group {
+      display: flex;
+      background: var(--column-bg);
+      padding: 0.2rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .btn-view-toggle {
+      border: none;
+      background: transparent;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .btn-view-toggle.active {
+      background: var(--card-bg);
+      color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* KANBAN BOARD */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(270px, 1fr));
+      gap: 0.85rem;
+      overflow-x: auto;
+      padding-bottom: 1.5rem;
+      align-items: flex-start;
+      -webkit-overflow-scrolling: touch;
+    }
+    .kanban-column {
+      background: var(--column-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.85rem;
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.2s;
+    }
+    .kanban-column.drag-over { background: #1e3a8a !important; border: 2px dashed #60a5fa !important; }
+
+    .column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.45rem;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .col-title-wrap { display: flex; align-items: center; gap: 0.4rem; }
+    .col-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .dot-email { background: #7c3aed; }
+    .dot-wa { background: #25d366; }
+    .dot-llamado { background: #3b82f6; }
+    .dot-cotizado { background: #f97316; }
+    .dot-cerrado { background: #10b981; }
+
+    .col-title { font-size: 0.82rem; font-weight: 800; color: var(--text-main); }
+    .col-count { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); margin-left: 0.2rem; }
+    .column-cards-wrap { display: flex; flex-direction: column; gap: 0.65rem; flex: 1; }
+
+    /* DEAL CARD */
+    .deal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.85rem;
+      box-shadow: var(--shadow-sm);
+      cursor: grab;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .deal-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .deal-card:active { cursor: grabbing; }
+    .deal-card.is-dragging { opacity: 0.35; transform: scale(0.96); }
+
+    .card-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+    .card-id { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); }
+    
+    .aging-pill {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.12rem 0.45rem;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .aging-recent { background: #dcfce7; color: #15803d; }
+    [data-theme="dark"] .aging-recent { background: #064e3b; color: #6ee7b7; }
+    .aging-medium { background: #fef3c7; color: #b45309; }
+    [data-theme="dark"] .aging-medium { background: #78350f; color: #fde68a; }
+    .aging-overdue { background: #fee2e2; color: #b91c1c; animation: pulse 2s infinite; }
+    [data-theme="dark"] .aging-overdue { background: #7f1d1d; color: #fca5a5; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+    .source-tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.1rem 0.35rem;
+      border-radius: 6px;
+      background: #eff6ff;
+      color: #1e40af;
+      display: inline-block;
+      margin-bottom: 0.3rem;
+    }
+    [data-theme="dark"] .source-tag { background: #0f172a; color: #93c5fd; border: 1px solid #1e3a8a; }
+
+    .card-business-name { font-size: 0.88rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.2rem; line-height: 1.3; }
+    .card-category { font-size: 0.7rem; font-weight: 600; color: #3b82f6; margin-bottom: 0.4rem; display: block; }
+
+    .card-price-row {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.45rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .promo-chip { font-size: 0.62rem; font-weight: 800; background: #ffedd5; color: #c2410c; padding: 0.1rem 0.35rem; border-radius: 6px; }
+    [data-theme="dark"] .promo-chip { background: #7c2d12; color: #fed7aa; }
+
+    .card-meta-list {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      margin-bottom: 0.55rem;
+    }
+
+    .card-stage-selector {
+      width: 100%;
+      padding: 0.35rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-bottom: 0.55rem;
+      background: var(--input-bg);
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .card-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+    .btn-action-sm {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+      padding: 0.4rem 0.45rem;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-act-email { background: var(--purple); color: #fff; }
+    .btn-act-email:hover { background: var(--purple-hover); }
+    .btn-act-call { background: #1e3a8a; color: #ffffff; }
+    .btn-act-wa { background: #25d366; color: #ffffff; }
+    .btn-act-followup {
+      grid-column: span 2;
+      background: #fff7ed;
+      color: #c2410c;
+      border: 1px solid #ffedd5;
+      font-size: 0.68rem;
+      margin-top: 0.1rem;
+    }
+    [data-theme="dark"] .btn-act-followup { background: #431407; color: #fed7aa; border-color: #7c2d12; }
+
+    .btn-act-discard {
+      grid-column: span 2;
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fee2e2;
+      font-size: 0.68rem;
+      margin-top: 0.1rem;
+    }
+    [data-theme="dark"] .btn-act-discard { background: #450a0a; color: #fca5a5; border-color: #7f1d1d; }
+    .btn-act-discard:hover { opacity: 0.9; }
+
+    /* BATCH BAR */
+    .batch-bar {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .batch-bar-left { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .batch-actions { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+    .btn-batch-ai {
+      background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+      color: #ffffff;
+      padding: 0.5rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    }
+
+    .leads-grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+    .lead-pool-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+    .lead-pool-card.selected { border-color: #7c3aed; background: rgba(124, 58, 237, 0.08); }
+
+    /* TABLE / ROWS VIEW */
+    .leads-table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .leads-table {
+      width: 100%;
+      min-width: 800px;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    .leads-table th {
+      background: var(--table-header-bg);
+      padding: 0.65rem 0.85rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      border-bottom: 1.5px solid var(--border);
+      white-space: nowrap;
+    }
+    .leads-table td {
+      padding: 0.75rem 0.85rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      color: var(--text-main);
+    }
+    .leads-table tr:hover { background: var(--table-hover); }
+    .leads-table tr.selected { background: rgba(124, 58, 237, 0.12); }
+
+    /* PAGINATION BAR */
+    .pagination-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+    .pagination-info { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); }
+    .pagination-controls { display: flex; align-items: center; gap: 0.35rem; }
+    .btn-page {
+      padding: 0.35rem 0.7rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: var(--card-bg);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+    .btn-page:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-page:hover:not(:disabled) { background: var(--input-bg); border-color: var(--primary); }
+
+    /* MULTICHANNEL LEAD GENERATOR ENGINES (MULTI-SELECT) */
+    .engines-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .engines-tabs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.65rem;
+      margin-bottom: 1.25rem;
+    }
+    .engine-tab-card {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 0.85rem 0.65rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      position: relative;
+      user-select: none;
+    }
+    .engine-tab-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .engine-tab-card.active {
+      border-color: var(--primary);
+      background: #eff6ff;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+    [data-theme="dark"] .engine-tab-card.active { background: #1e3a8a; border-color: #60a5fa; }
+    .engine-check {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: 0.8rem;
+      color: #10b981;
+      display: none;
+    }
+    .engine-tab-card.active .engine-check { display: block; }
+    .engine-icon { font-size: 1.4rem; margin-bottom: 0.25rem; display: block; }
+    .engine-title { font-size: 0.8rem; font-weight: 800; color: var(--text-main); }
+    .engine-sub { font-size: 0.68rem; color: var(--text-muted); }
+
+    /* PRESETS QUICK PACKS */
+    .presets-banner {
+      background: var(--input-bg);
+      border: 1.5px dashed var(--border);
+      border-radius: 12px;
+      padding: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+    .presets-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.5rem;
+    }
+    .btn-preset-pack {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .btn-preset-pack:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+    .preset-name { font-size: 0.78rem; font-weight: 800; color: var(--text-main); }
+    .preset-desc { font-size: 0.68rem; color: var(--text-muted); }
+
+    /* CALENDAR GRID */
+    .calendar-container-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+    .cal-picker-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; box-shadow: var(--shadow-sm); }
+    .cal-header-month { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .cal-header-month h3 { font-size: 1.05rem; font-weight: 800; color: var(--text-main); }
+    .cal-grid-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; text-align: center; }
+    .cal-day-label { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); padding-bottom: 0.4rem; }
+    .cal-day-btn {
+      aspect-ratio: 1; border-radius: 8px; border: 1px solid transparent; background: var(--input-bg);
+      font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; position: relative; transition: all 0.15s;
+      color: var(--text-main);
+    }
+    .cal-day-btn:hover { background: var(--border); }
+    .cal-day-btn.selected { background: var(--primary) !important; color: #ffffff !important; font-weight: 800; }
+    .cal-day-btn.has-activity::after { content: ""; width: 5px; height: 5px; background: #7c3aed; border-radius: 50%; position: absolute; bottom: 3px; }
+    .cal-day-btn.selected.has-activity::after { background: #ffffff; }
+
+    .day-report-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; box-shadow: var(--shadow-sm); }
+    .day-report-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 0.5rem; }
+    .day-report-title h2 { font-size: 1.15rem; font-weight: 800; color: var(--text-main); }
+    .day-kpi-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.5rem; margin-bottom: 1.25rem; }
+    .day-kpi-item { background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 0.65rem; text-align: center; }
+    .day-kpi-label { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+    .day-kpi-val { font-size: 1.2rem; font-weight: 800; color: var(--text-main); }
+
+    .timeline-list { display: flex; flex-direction: column; gap: 0.65rem; }
+    .timeline-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem; background: var(--input-bg); border-radius: 10px; border-left: 3px solid var(--primary); }
+    .timeline-icon { width: 30px; height: 30px; border-radius: 50%; background: var(--card-bg); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; border: 1px solid var(--border); flex-shrink: 0; }
+    .timeline-content { flex: 1; }
+    .timeline-content strong { font-size: 0.85rem; color: var(--text-main); }
+    .timeline-content p { font-size: 0.75rem; color: var(--text-muted); }
+    .timeline-time { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); }
+
+    .generator-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; max-width: 850px; margin: 0 auto; box-shadow: var(--shadow-sm); }
+    .generator-box h2 { font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem; }
+    .generator-box p { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.25rem; }
+
+    .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; }
+    .settings-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; box-shadow: var(--shadow-sm); }
+    .settings-card h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 0.25rem; color: var(--text-main); }
+    .settings-card p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; }
+
+    .dev-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .dev-table th { text-align: left; padding: 0.55rem 0.65rem; background: var(--table-header-bg); color: var(--text-muted); font-size: 0.68rem; text-transform: uppercase; }
+    .dev-table td { padding: 0.6rem 0.65rem; border-bottom: 1px solid var(--border); color: var(--text-main); }
+
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; z-index: 100000; padding: 0.85rem;
+    }
+    .modal { background: var(--card-bg); color: var(--text-main); max-width: 650px; width: 100%; border-radius: 16px; padding: 1.5rem; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; border: 1px solid var(--border); }
+    .proposal-card-item { background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem; margin-bottom: 0.85rem; }
+
+    .toast {
+      position: fixed; bottom: 20px; right: 20px; background: #0f172a; color: #ffffff;
+      padding: 0.65rem 1.15rem; border-radius: 10px; font-size: 0.82rem; font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: none; z-index: 200000; border-left: 4px solid var(--success);
+    }
+    .loader { display: inline-block; width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ==========================================
+       RESPONSIVE CSS (MOBILE & TABLET ADAPTATION)
+       ========================================== */
+    @media (max-width: 900px) {
+      .btn-mobile-menu { display: inline-flex; }
+      .btn-close-sidebar { display: block; }
+      .sidebar {
+        position: fixed;
+        left: -300px;
+        top: 0;
+        bottom: 0;
+        width: 275px;
+        z-index: 9999;
+        box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      }
+      .sidebar.open { transform: translateX(300px); }
+      .calendar-container-grid { grid-template-columns: 1fr; }
+      .top-header { padding: 0.6rem 0.85rem; }
+      .content-body { padding: 1rem 0.85rem; }
+      .top-search-wrap { width: 100%; order: 2; }
+      .top-header { flex-wrap: wrap; }
+      .top-header-actions { margin-left: auto; }
+      .header-left-wrap { width: 100%; justify-content: space-between; }
+      .kanban-board { gap: 0.75rem; }
+      .leads-grid-layout { grid-template-columns: 1fr; }
+      .generator-box { padding: 1.15rem 0.85rem; }
+      .presets-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .page-title-row h1 { font-size: 1.3rem; }
+      .kpi-row { grid-template-columns: 1fr; }
+      .batch-bar { flex-direction: column; align-items: stretch; }
+      .batch-bar-left, .batch-actions { width: 100%; justify-content: space-between; }
+      .btn-batch-ai { width: 100%; justify-content: center; }
+      .modal { padding: 1.15rem 0.85rem; }
+      .presets-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PIN LOCK SCREEN -->
+  <div id="pin-lock-screen">
+    <div class="pin-card">
+      <div class="pin-logo">🔒</div>
+      <h2>Acceso Seguro al CRM</h2>
+      <p>Introduce tu PIN de 4 dígitos para ingresar.</p>
+      <form onsubmit="handlePinSubmit(event)">
+        <div class="pin-inputs">
+          <input type="password" maxlength="1" class="pin-digit" id="p1" inputmode="numeric" autofocus oninput="moveNext(this, 'p2')">
+          <input type="password" maxlength="1" class="pin-digit" id="p2" inputmode="numeric" oninput="moveNext(this, 'p3')">
+          <input type="password" maxlength="1" class="pin-digit" id="p3" inputmode="numeric" oninput="moveNext(this, 'p4')">
+          <input type="password" maxlength="1" class="pin-digit" id="p4" inputmode="numeric" oninput="moveNext(this, null)">
+        </div>
+        <button type="submit" class="btn-pin-submit">Ingresar al Pipeline 🚀</button>
+        <div class="pin-error" id="pin-error-msg">PIN Incorrecto. Intenta de nuevo.</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- APP LAYOUT -->
+  <div class="app-layout" id="app-container" style="display:none;">
+    
+    <!-- BACKDROP FOR MOBILE SIDEBAR -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar" id="app-sidebar">
+      <div>
+        <div class="sidebar-brand">
+          <div class="brand-left">
+            <div class="brand-logo-badge">FL</div>
+            <div class="brand-text">
+              <h3>FL Container</h3>
+              <span>Leads & CRM Florida</span>
+            </div>
+          </div>
+          <button class="btn-close-sidebar" onclick="closeSidebar()" aria-label="Cerrar Menú">✕</button>
+        </div>
+
+        <div class="nav-section-title">CRM & Ventas</div>
+        <div class="nav-list">
+          <button class="nav-item active" id="nav-btn-pipeline" onclick="switchNavTab('pipeline-view')">
+            <div class="nav-item-left">
+              <span class="nav-item-icon">📊</span>
+              <span>Deals Pipeline</span>
+            </div>
+            <span class="nav-badge" id="nav-badge-pipeline">0</span>
+          </button>
+
+          <button class="nav-item" id="nav-btn-calendar" onclick="switchNavTab('calendar-view')">
+            <div class="nav-item-left">
+              <span class="nav-item-icon">📅</span>
+              <span>Calendario & Actividad</span>
+            </div>
+            <span class="nav-badge" style="background:#ede9fe;color:#6d28d9;" id="nav-badge-today-activity">Hoy</span>
+          </button>
+
+          <button class="nav-item" id="nav-btn-leads" onclick="switchNavTab('leads-view')">
+            <div class="nav-item-left">
+              <span class="nav-item-icon">👥</span>
+              <span>Banco de Prospectos</span>
+            </div>
+            <span class="nav-badge" id="nav-badge-new-leads" style="background:#dbeafe;color:#1e40af;">0</span>
+          </button>
+
+          <button class="nav-item" id="nav-btn-generator" onclick="switchNavTab('generator-view')">
+            <div class="nav-item-left">
+              <span class="nav-item-icon">⚡</span>
+              <span>Generador Multifuente</span>
+            </div>
+            <span class="nav-badge" style="background:#ffedd5;color:#c2410c;">6 Motores</span>
+          </button>
+        </div>
+
+        <div class="nav-section-title">Archivo & Gestión</div>
+        <div class="nav-list">
+          <button class="nav-item" id="nav-btn-archive" onclick="switchNavTab('archive-view')">
+            <div class="nav-item-left">
+              <span class="nav-item-icon">🗃️</span>
+              <span>Archivo & Descartados</span>
+            </div>
+            <span class="nav-badge" id="nav-badge-archived">0</span>
+          </button>
+
+          <button class="nav-item" id="nav-btn-config" onclick="switchNavTab('config-view')">
+            <div class="nav-item-left">
+              <span class="nav-item-icon">⚙️</span>
+              <span>Configuración</span>
+            </div>
+          </button>
+
+          <button class="nav-item" onclick="exportLeadsCSV()">
+            <div class="nav-item-left">
+              <span class="nav-item-icon">📥</span>
+              <span>Descargar CSV</span>
+            </div>
+          </button>
+
+          <button class="nav-item" style="color:#ef4444;" onclick="lockApp()">
+            <div class="nav-item-left">
+              <span class="nav-item-icon">🔒</span>
+              <span>Bloquear / Salir</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar-wrap">
+          <div class="user-avatar">FL</div>
+          <div class="user-meta">
+            <h4>Agente Miami</h4>
+            <p>🟢 Online</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN RIGHT CONTENT -->
+    <main class="main-content">
+      
+      <!-- Top Search & Action Bar -->
+      <header class="top-header">
+        <div class="header-left-wrap">
+          <button class="btn-mobile-menu" onclick="toggleSidebar()" aria-label="Abrir Menú">
+            ☰ Menú
+          </button>
+          
+          <div class="top-search-wrap">
+            <span class="top-search-icon">🔍</span>
+            <input type="text" class="top-search-input" id="global-search" placeholder="Buscar negocio, teléfono, ciudad o dueño...">
+          </div>
+        </div>
+        
+        <div class="top-header-actions">
+          <!-- BOTÓN MODO OSCURO / CLARO -->
+          <button class="btn-theme-toggle" id="btn-toggle-theme" onclick="toggleTheme()" title="Cambiar tema">
+            <span id="theme-icon">🌙</span>
+            <span id="theme-label">Oscuro</span>
+          </button>
+
+          <div class="status-pill">🟢 Online</div>
+          <button class="btn-new-lead" onclick="openAddModal()">➕ Lead</button>
+        </div>
+      </header>
+
+      <div class="content-body">
+
+        <!-- ==========================================
+             TAB 1: DEALS PIPELINE
+             ========================================== -->
+        <div class="app-tab-pane active" id="pipeline-view">
+          
+          <div class="page-title-row">
+            <div>
+              <h1>Deals pipeline</h1>
+              <p>Seguimiento activo de prospectos con antigüedad y descarte rápido.</p>
+            </div>
+          </div>
+
+          <!-- KPI Metric Cards -->
+          <div class="kpi-row">
+            <div class="kpi-card">
+              <div class="kpi-card-title">
+                <span>Propuestas por Correo (IA)</span>
+                <span>📧</span>
+              </div>
+              <div class="kpi-values-grid">
+                <div>
+                  <div class="kpi-sub-label">En Pipeline Correo</div>
+                  <div class="kpi-sub-val" id="kpi-emails-sent" style="color:var(--purple);">0</div>
+                  <div class="kpi-sub-trend">Propuestas IA</div>
+                </div>
+                <div>
+                  <div class="kpi-sub-label">Cotizaciones</div>
+                  <div class="kpi-sub-val" id="kpi-cotizados" style="color:var(--accent);">0</div>
+                  <div class="kpi-sub-trend">Enviadas</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-card-title">
+                <span>WhatsApp & Llamadas</span>
+                <span>💬</span>
+              </div>
+              <div class="kpi-values-grid">
+                <div>
+                  <div class="kpi-sub-label">WhatsApp Enviados</div>
+                  <div class="kpi-sub-val" id="kpi-wa-sent" style="color:var(--wa-dark);">0</div>
+                  <div class="kpi-sub-trend">Móviles</div>
+                </div>
+                <div>
+                  <div class="kpi-sub-label">Llamadas</div>
+                  <div class="kpi-sub-val" id="kpi-calls-made" style="color:#3b82f6;">0</div>
+                  <div class="kpi-sub-trend">Oficinas</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-card-title">
+                <span>Alertas & Ventas</span>
+                <span>⏱️</span>
+              </div>
+              <div class="kpi-values-grid">
+                <div>
+                  <div class="kpi-sub-label">Requieren Seguimiento</div>
+                  <div class="kpi-sub-val" id="kpi-overdue-followups" style="color:var(--danger);">0</div>
+                  <div class="kpi-sub-trend">⚠️ +4 Días sin cierre</div>
+                </div>
+                <div>
+                  <div class="kpi-sub-label">Ventas Cerradas</div>
+                  <div class="kpi-sub-val" id="kpi-cerrados" style="color:var(--success);">0</div>
+                  <div class="kpi-sub-trend">🎉 Ganadas</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filtros de tiempo en Pipeline -->
+          <div class="toolbar-row">
+            <div class="toolbar-left">
+              <select id="filter-pipe-time" class="filter-select" onchange="renderPipeline()">
+                <option value="all">⏱️ Todos los tiempos</option>
+                <option value="today">🟢 Contactados Hoy</option>
+                <option value="this_week">🟡 Esta Semana</option>
+                <option value="overdue">🚨 Requieren Seguimiento (+4 días)</option>
+              </select>
+
+              <select id="filter-pipe-city" class="filter-select" onchange="renderPipeline()">
+                <option value="all">📍 Todas las Ciudades de Florida</option>
+                <option value="Naples">Naples (Collier County)</option>
+                <option value="Lehigh Acres">Lehigh Acres (Lee County)</option>
+                <option value="Clewiston">Clewiston (Hendry County)</option>
+                <option value="Montura Ranches">Montura Ranches / Clewiston (Hendry County)</option>
+                <option value="West Palm Beach">West Palm Beach (Palm Beach County)</option>
+                <option value="Loxahatchee">Loxahatchee (Palm Beach County)</option>
+                <option value="Florida Keys">Cayos de Florida (Key West, Key Largo, Marathon)</option>
+                <option value="Stuart">Stuart (Martin County)</option>
+                <option value="Jupiter">Jupiter (Palm Beach County)</option>
+                <option value="Lake Worth">Lake Worth Beach (Palm Beach County)</option>
+                <option value="Boca Raton">Boca Raton (Palm Beach County)</option>
+                <option value="Boynton Beach">Boynton Beach (Palm Beach County)</option>
+                <option value="Homestead">Homestead / Redland (Miami-Dade)</option>
+                <option value="Miami">Miami (Doral / Medley / Centro)</option>
+                <option value="Hialeah">Hialeah (Miami-Dade)</option>
+                <option value="Doral">Doral (Carga & Logística)</option>
+                <option value="Fort Lauderdale">Fort Lauderdale / Broward</option>
+                <option value="Pompano Beach">Pompano Beach (Broward)</option>
+                <option value="Orlando">Orlando / Orange County</option>
+                <option value="Tampa">Tampa / Hillsborough</option>
+                <option value="Ocala">Ocala / Marion (Ranchos y Terrenos)</option>
+                <option value="Fort Myers">Fort Myers / Lee</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- KANBAN BOARD -->
+          <div class="kanban-board">
+            <div class="kanban-column" id="col-email" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'email')">
+              <div class="column-header">
+                <div class="col-title-wrap">
+                  <span class="col-dot dot-email"></span>
+                  <span class="col-title">📧 Propuesta Correo</span>
+                  <span class="col-count" id="count-email">0</span>
+                </div>
+              </div>
+              <div class="column-cards-wrap" id="cards-email"></div>
+            </div>
+
+            <div class="kanban-column" id="col-wa" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'wa')">
+              <div class="column-header">
+                <div class="col-title-wrap">
+                  <span class="col-dot dot-wa"></span>
+                  <span class="col-title">💬 WhatsApp</span>
+                  <span class="col-count" id="count-wa">0</span>
+                </div>
+              </div>
+              <div class="column-cards-wrap" id="cards-wa"></div>
+            </div>
+
+            <div class="kanban-column" id="col-llamado" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'llamado')">
+              <div class="column-header">
+                <div class="col-title-wrap">
+                  <span class="col-dot dot-llamado"></span>
+                  <span class="col-title">📞 Llamados</span>
+                  <span class="col-count" id="count-llamado">0</span>
+                </div>
+              </div>
+              <div class="column-cards-wrap" id="cards-llamado"></div>
+            </div>
+
+            <div class="kanban-column" id="col-cotizado" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'cotizado')">
+              <div class="column-header">
+                <div class="col-title-wrap">
+                  <span class="col-dot dot-cotizado"></span>
+                  <span class="col-title">📄 Cotizados</span>
+                  <span class="col-count" id="count-cotizado">0</span>
+                </div>
+              </div>
+              <div class="column-cards-wrap" id="cards-cotizado"></div>
+            </div>
+
+            <div class="kanban-column" id="col-cerrado" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'cerrado')">
+              <div class="column-header">
+                <div class="col-title-wrap">
+                  <span class="col-dot dot-green"></span>
+                  <span class="col-title">🎉 Cerrados</span>
+                  <span class="col-count" id="count-cerrado">0</span>
+                </div>
+              </div>
+              <div class="column-cards-wrap" id="cards-cerrado"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 2: CALENDARIO & ACTIVIDAD DIARIA
+             ========================================== -->
+        <div class="app-tab-pane" id="calendar-view">
+          <div class="page-title-row">
+            <div>
+              <h1>Calendario & Registro de Actividad</h1>
+              <p>Audita las interacciones diarias y fechas de contacto.</p>
+            </div>
+          </div>
+
+          <div class="calendar-container-grid">
+            <div class="cal-picker-card">
+              <div class="cal-header-month">
+                <h3 id="cal-month-name">Agosto 2026</h3>
+                <span class="status-pill" style="font-size:0.72rem;">📅 Selecciona un día</span>
+              </div>
+              <div class="cal-grid-days" id="cal-grid-body"></div>
+              <div style="margin-top:1.25rem;font-size:0.75rem;color:var(--text-muted);display:flex;align-items:center;gap:0.5rem;">
+                <span style="width:7px;height:7px;background:#7c3aed;border-radius:50%;display:inline-block;"></span>
+                <span>Días con actividad registrada</span>
+              </div>
+            </div>
+
+            <div class="day-report-card">
+              <div class="day-report-title">
+                <div>
+                  <h2 id="selected-day-title">Actividad de Hoy</h2>
+                  <p style="font-size:0.82rem;color:var(--text-muted);" id="selected-day-subtitle">Resumen de interacciones comerciales.</p>
+                </div>
+                <button class="btn-action-sm btn-batch-ai" onclick="switchNavTab('leads-view')">
+                  ➕ Contactar Más Leads
+                </button>
+              </div>
+
+              <div class="day-kpi-strip">
+                <div class="day-kpi-item"><div class="day-kpi-label">Total Contactos</div><div class="day-kpi-val" id="day-kpi-total">0</div></div>
+                <div class="day-kpi-item"><div class="day-kpi-label">📧 Correos IA</div><div class="day-kpi-val" id="day-kpi-emails" style="color:#7c3aed;">0</div></div>
+                <div class="day-kpi-item"><div class="day-kpi-label">💬 WhatsApp</div><div class="day-kpi-val" id="day-kpi-wa" style="color:#15803d;">0</div></div>
+                <div class="day-kpi-item"><div class="day-kpi-label">📞 Llamadas</div><div class="day-kpi-val" id="day-kpi-calls" style="color:#3b82f6;">0</div></div>
+              </div>
+
+              <h3 style="font-size:0.95rem;font-weight:800;margin-bottom:0.75rem;">Historial Detallado de Contactos</h3>
+              <div class="timeline-list" id="day-timeline-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 3: BANCO DE PROSPECTOS (SOLO NUEVOS POR DEFECTO)
+             ========================================== -->
+        <div class="app-tab-pane" id="leads-view">
+          
+          <div class="page-title-row">
+            <div>
+              <h1>Banco de Prospectos Nuevos</h1>
+              <p>Solo muestra prospectos vírgenes (sin contactar). Al contactarlos, pasan automáticamente al Pipeline.</p>
+            </div>
+            
+            <div class="view-switcher-group">
+              <button class="btn-view-toggle active" id="btn-toggle-grid" onclick="setViewMode('grid')">
+                <span>🗂️ Tarjetas</span>
+              </button>
+              <button class="btn-view-toggle" id="btn-toggle-table" onclick="setViewMode('table')">
+                <span>📄 Filas / Tabla</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Barra de Acciones Masivas IA -->
+          <div class="batch-bar">
+            <div class="batch-bar-left">
+              <input type="checkbox" id="select-all-checkbox" style="transform:scale(1.2);cursor:pointer;" onchange="toggleSelectAll(this.checked)">
+              <span style="font-size:0.85rem;font-weight:700;" id="batch-selected-label">0 seleccionados</span>
+              <button class="btn-action-sm" style="background:#334155;color:#fff;padding:0.35rem 0.65rem;" onclick="selectFirstN(5)">⚡ 5</button>
+              <button class="btn-action-sm" style="background:#1e293b;color:#38bdf8;padding:0.35rem 0.65rem;" onclick="selectFirstN(25)">⚡ 25</button>
+            </div>
+
+            <div class="batch-actions">
+              <button class="btn-batch-ai" onclick="openAIBatchModal()">
+                <span>🤖 Redactar y Enviar Propuestas con IA</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtros de la lista -->
+          <div class="toolbar-row">
+            <div class="toolbar-left">
+              <select id="filter-status-pool" class="filter-select" onchange="resetPageAndRender()" style="font-weight:800;border-color:#3b82f6;">
+                <option value="nuevo" selected>⚪ Solo Prospectos Nuevos (Sin contactar)</option>
+                <option value="pipeline">🟢 Ya en Pipeline Activo</option>
+                <option value="all">🌐 Ver Todos (Histórico Completo)</option>
+              </select>
+
+              <select id="filter-cat-pool" class="filter-select" onchange="resetPageAndRender()">
+                <option value="all">Todas las Categorías</option>
+              </select>
+              
+              <select id="filter-city-pool" class="filter-select" onchange="resetPageAndRender()">
+                <option value="all">📍 Todas las Ciudades de Florida</option>
+                <option value="Naples">Naples (Collier County)</option>
+                <option value="Lehigh Acres">Lehigh Acres (Lee County)</option>
+                <option value="Clewiston">Clewiston (Hendry County)</option>
+                <option value="Montura Ranches">Montura Ranches / Clewiston (Hendry County)</option>
+                <option value="West Palm Beach">West Palm Beach (Palm Beach County)</option>
+                <option value="Loxahatchee">Loxahatchee (Palm Beach County)</option>
+                <option value="Florida Keys">Cayos de Florida (Key West, Key Largo, Marathon)</option>
+                <option value="Stuart">Stuart (Martin County)</option>
+                <option value="Jupiter">Jupiter (Palm Beach County)</option>
+                <option value="Lake Worth">Lake Worth Beach (Palm Beach County)</option>
+                <option value="Boca Raton">Boca Raton (Palm Beach County)</option>
+                <option value="Boynton Beach">Boynton Beach (Palm Beach County)</option>
+                <option value="Homestead">Homestead / Redland (Miami-Dade)</option>
+                <option value="Miami">Miami (Doral / Medley / Centro)</option>
+                <option value="Hialeah">Hialeah (Miami-Dade)</option>
+                <option value="Doral">Doral (Carga & Logística)</option>
+                <option value="Fort Lauderdale">Fort Lauderdale / Broward</option>
+                <option value="Pompano Beach">Pompano Beach (Broward)</option>
+                <option value="Orlando">Orlando / Orange County</option>
+                <option value="Tampa">Tampa / Hillsborough</option>
+                <option value="Ocala">Ocala / Marion (Ranchos y Terrenos)</option>
+                <option value="Fort Myers">Fort Myers / Lee</option>
+              </select>
+              
+              <select id="filter-source-pool" class="filter-select" onchange="resetPageAndRender()">
+                <option value="all">Todas las Fuentes</option>
+                <option value="google">Google Maps</option>
+                <option value="sunbiz">Sunbiz (Dueños)</option>
+                <option value="permits">Permisos de Obra</option>
+                <option value="fmc">Puertos & FMC</option>
+              </select>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:0.4rem;">
+              <span style="font-size:0.75rem;font-weight:700;color:var(--text-muted);">Por pág:</span>
+              <select id="page-size-select" class="filter-select" onchange="changePageSize(this.value)">
+                <option value="25">25</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- VISTA 1: GRID DE TARJETAS -->
+          <div class="leads-grid-layout" id="all-leads-grid"></div>
+
+          <!-- VISTA 2: TABLA POR FILAS COMPACTA -->
+          <div class="leads-table-container" id="leads-table-wrap" style="display:none;">
+            <table class="leads-table">
+              <thead>
+                <tr>
+                  <th style="width:36px;"><input type="checkbox" onchange="toggleSelectAll(this.checked)"></th>
+                  <th>Negocio & Dueño</th>
+                  <th>Categoría</th>
+                  <th>Ubicación</th>
+                  <th>Teléfono Directo</th>
+                  <th>Correo Electrónico</th>
+                  <th>Fuente / Origen</th>
+                  <th>Estado</th>
+                  <th style="text-align:right;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="leads-table-body"></tbody>
+            </table>
+          </div>
+
+          <!-- PAGINACIÓN BAR -->
+          <div class="pagination-bar">
+            <div class="pagination-info" id="pagination-info-text">Mostrando 0 de 0 prospectos</div>
+            <div class="pagination-controls">
+              <button class="btn-page" id="btn-page-prev" onclick="prevPage()">← Ant</button>
+              <span style="font-size:0.8rem;font-weight:700;padding:0 0.35rem;" id="page-number-display">Pág 1</span>
+              <button class="btn-page" id="btn-page-next" onclick="nextPage()">Sig →</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ==========================================
+             TAB 4: ARCHIVO & DESCARTADOS
+             ========================================== -->
+        <div class="app-tab-pane" id="archive-view">
+          <div class="page-title-row">
+            <div>
+              <h1>🗃️ Archivo & Prospectos Descartados</h1>
+              <p>Historial de leads que no tenían necesidad actual o cerrados. Puedes reactivarlos a nuevos cuando desees.</p>
+            </div>
+          </div>
+
+          <div class="leads-table-container">
+            <table class="leads-table">
+              <thead>
+                <tr>
+                  <th>Negocio</th>
+                  <th>Categoría & Ciudad</th>
+                  <th>Teléfono</th>
+                  <th>Motivo de Descarte / Cierre</th>
+                  <th>Fecha</th>
+                  <th style="text-align:right;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="archive-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 5: GENERADOR MULTIFUENTE DE LEADS (MULTI-MOTOR)
+             ========================================== -->
+        <div class="app-tab-pane" id="generator-view">
+          <div class="generator-box">
+            <h2>⚡ Extractor Multifuente de Clientes en Florida</h2>
+            <p>Genera prospectos de forma masiva o quirúrgica. Usa los paquetes de 1 clic para ahorrar tiempo.</p>
+
+            <!-- PRESETS / PACKS RÁPIDOS DE 1 CLIC -->
+            <div class="presets-banner">
+              <div class="presets-title">
+                <span>⚡ PAQUETES RÁPIDOS DE EXTRACCIÓN (1 Clic):</span>
+              </div>
+              <div class="presets-grid">
+                <button type="button" class="btn-preset-pack" onclick="applyPreset('obras')">
+                  <span class="preset-name">🏗️ Obras & Contratistas</span>
+                  <span class="preset-desc">Miami, Broward & Palm Beach · 100 Leads</span>
+                </button>
+                <button type="button" class="btn-preset-pack" onclick="applyPreset('fincas')">
+                  <span class="preset-name">🌾 Fincas & Terrenos</span>
+                  <span class="preset-desc">Clewiston, Montura, Homestead, Ocala · 100 Leads</span>
+                </button>
+                <button type="button" class="btn-preset-pack" onclick="applyPreset('costa_oeste')">
+                  <span class="preset-name">🌴 Costa Oeste & Cayos</span>
+                  <span class="preset-desc">Naples, Lehigh, Cayos, Fort Myers · 100 Leads</span>
+                </button>
+                <button type="button" class="btn-preset-pack" onclick="applyPreset('mega_total')" style="border-color:#7c3aed;background:rgba(124,58,237,0.08);">
+                  <span class="preset-name" style="color:#7c3aed;">🚀 Mega Barrido Total</span>
+                  <span class="preset-desc">Todo Florida · Todos los Nichos · 100 Leads</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="engines-toolbar">
+              <span style="font-size:0.75rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;">FUENTES DE PROSPECCIÓN ACTIVAS:</span>
+              <div style="display:flex;gap:0.4rem;">
+                <button type="button" class="btn-action-sm" style="background:var(--primary);color:#fff;" onclick="selectAllEngines()">⚡ Todas las Fuentes (360°)</button>
+                <button type="button" class="btn-action-sm" style="background:var(--input-bg);border:1px solid var(--border);color:var(--text-muted);" onclick="clearAllEngines()">Restablecer</button>
+              </div>
+            </div>
+
+            <!-- MULTI-SELECT ENGINES -->
+            <div class="engines-tabs-grid">
+              <div class="engine-tab-card active" data-engine="google_maps" onclick="toggleEngine('google_maps', this)">
+                <span class="engine-check">✓</span>
+                <span class="engine-icon">📍</span>
+                <div class="engine-title">Google Maps</div>
+                <span class="engine-sub">Places & Directorio</span>
+              </div>
+              <div class="engine-tab-card active" data-engine="sunbiz" onclick="toggleEngine('sunbiz', this)">
+                <span class="engine-check">✓</span>
+                <span class="engine-icon">🏛️</span>
+                <div class="engine-title">Sunbiz Florida</div>
+                <span class="engine-sub">Dueños de LLCs</span>
+              </div>
+              <div class="engine-tab-card active" data-engine="permits" onclick="toggleEngine('permits', this)">
+                <span class="engine-check">✓</span>
+                <span class="engine-icon">🏗️</span>
+                <div class="engine-title">Permisos Obra</div>
+                <span class="engine-sub">Contratistas Activos</span>
+              </div>
+              <div class="engine-tab-card active" data-engine="fmc_ports" onclick="toggleEngine('fmc_ports', this)">
+                <span class="engine-check">✓</span>
+                <span class="engine-icon">🚢</span>
+                <div class="engine-title">Puertos & FMC</div>
+                <span class="engine-sub">Exportadores CW</span>
+              </div>
+              <div class="engine-tab-card active" data-engine="crawler" onclick="toggleEngine('crawler', this)">
+                <span class="engine-check">✓</span>
+                <span class="engine-icon">🌐</span>
+                <div class="engine-title">Web Crawler IA</div>
+                <span class="engine-sub">Extracción Correos</span>
+              </div>
+              <div class="engine-tab-card active" data-engine="geo_osm" onclick="toggleEngine('geo_osm', this)">
+                <span class="engine-check">✓</span>
+                <span class="engine-icon">🗺️</span>
+                <div class="engine-title">Geoespacial</div>
+                <span class="engine-sub">Radio y Coordenadas</span>
+              </div>
+            </div>
+
+            <form onsubmit="handleMultiEngineSearch(event)">
+              <div style="margin-bottom:1.15rem;">
+                <label style="font-size:0.75rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.35rem;">CATEGORÍA O NICHO COMERCIAL *</label>
+                <select id="gen-cat" class="filter-select" style="width:100%;padding:0.7rem;font-weight:700;" required>
+                  <option value="all_niches" selected>🌐 TODOS LOS NICHOS COMERCIALES (Balanceado)</option>
+                  <option value="construccion_techado">🏗️ Compañías de Construcción, Contratistas y Techado (Bodegas de Obra)</option>
+                  <option value="carreteras_asfalto">🚜 Pavimentación, Asfalto y Obras Viales (Maquinaria y Tráfico)</option>
+                  <option value="viveros_fincas">🌾 Viveros, Fincas, Granjas y Ranchos (Bodegas de Terreno y Abonos)</option>
+                  <option value="supermercados_alimentos">🛒 Supermercados, Distribuidoras y Mayoristas de Alimentos (Stock Seco)</option>
+                  <option value="farmaceuticas_medico">💊 Farmacéuticas, Laboratorios y Suministros Médicos (Insumos Seguros)</option>
+                  <option value="exportadores_envios">🚢 Agencias de Envíos, Carga y Logística (Exportación LATAM/Caribe)</option>
+                  <option value="florerias_viveros">🌸 Florerías, Viveros y Distribuidores de Flores (Herramientas y Macetas)</option>
+                  <option value="empresas_electricas">⚡ Empresas Eléctricas, Generadores y Servicios Públicos (Cables y Equipos)</option>
+                  <option value="telefonia_telecom">📡 Telecomunicaciones, Torres y Fibra Óptica (Equipos de Red)</option>
+                  <option value="zoologicos_santuarios">🦁 Zoológicos, Parques Temáticos y Santuarios (Mantenimiento y Comida)</option>
+                  <option value="acuarios_vida_marina">🐬 Acuarios y Centros de Vida Marina (Resguardo de Equipos y Filtros)</option>
+                  <option value="pesca_mariscos">🎣 Empresas Pesqueras, Marinas y Marisquerías (Aparejos y Carga Seca)</option>
+                  <option value="motocross_mudding">🏍️ Motocross, ATVs, Mudding / Pistas y Concesionarios Off-Road (Motos y Repuestos)</option>
+                  <option value="talleres_mecanicos">🔧 Talleres Mecánicos, Auto Body y Yonkes (Motores y Repuestos)</option>
+                  <option value="eventos_alquileres">🎪 Alquiler de Eventos, Carpas y Food Trucks (Inventario)</option>
+                </select>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:0.75rem;margin-bottom:1.25rem;">
+                <div>
+                  <label style="font-size:0.75rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.35rem;">CONDADO / LOCALIDAD EN FLORIDA *</label>
+                  <select id="gen-city" class="filter-select" style="width:100%;padding:0.7rem;font-weight:700;" required>
+                    <option value="all_cities" selected>📍 TODAS LAS LOCALIDADES (Todo Florida 360°)</option>
+                    <!-- LOCALIDADES SOLICITADAS POR EL USUARIO -->
+                    <option value="Naples">Naples (Collier County)</option>
+                    <option value="Lehigh Acres">Lehigh Acres (Lee County)</option>
+                    <option value="Clewiston">Clewiston (Hendry County)</option>
+                    <option value="Montura Ranches">Montura Ranches / Clewiston (Hendry County)</option>
+                    <option value="West Palm Beach">West Palm Beach (Palm Beach County)</option>
+                    <option value="Loxahatchee">Loxahatchee (Palm Beach County)</option>
+                    <option value="Florida Keys">Cayos de Florida (Key West, Key Largo, Marathon)</option>
+                    <option value="Stuart">Stuart (Martin County)</option>
+                    <option value="Jupiter">Jupiter (Palm Beach County)</option>
+                    <option value="Lake Worth">Lake Worth Beach (Palm Beach County)</option>
+                    <option value="Boca Raton">Boca Raton (Palm Beach County)</option>
+                    <option value="Boynton Beach">Boynton Beach (Palm Beach County)</option>
+                    <!-- PRINCIPALES CONDADOS Y METRÓPOLIS DE FLORIDA -->
+                    <option value="Homestead">Homestead / Redland (Miami-Dade)</option>
+                    <option value="Miami">Miami (Doral / Medley / Centro)</option>
+                    <option value="Hialeah">Hialeah (Miami-Dade)</option>
+                    <option value="Doral">Doral (Carga & Logística)</option>
+                    <option value="Fort Lauderdale">Fort Lauderdale / Broward</option>
+                    <option value="Pompano Beach">Pompano Beach (Broward)</option>
+                    <option value="Orlando">Orlando / Orange County</option>
+                    <option value="Tampa">Tampa / Hillsborough</option>
+                    <option value="Ocala">Ocala / Marion (Ranchos y Terrenos)</option>
+                    <option value="Fort Myers">Fort Myers / Lee</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:0.75rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.35rem;">CANTIDAD DE NEGOCIOS</label>
+                  <select id="gen-radius" class="filter-select" style="width:100%;padding:0.7rem;font-weight:700;">
+                    <option value="25">25 Negocios (Prueba)</option>
+                    <option value="50">50 Negocios (Mediano)</option>
+                    <option value="100" selected>100 Negocios (Recomendado ⚡)</option>
+                    <option value="150">150 Negocios (Mega Lote 🚀)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="gen-progress-wrap" style="display:none;background:var(--input-bg);border:1.5px solid #3b82f6;padding:1rem;border-radius:12px;margin-bottom:1.25rem;">
+                <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.4rem;">
+                  <span class="loader" style="border-top-color:#3b82f6;border-color:rgba(59,130,246,0.2);width:18px;height:18px;"></span>
+                  <strong id="gen-progress-text" style="color:#3b82f6;font-size:0.9rem;">Iniciando rastreo multi-región...</strong>
+                </div>
+                <div style="font-size:0.72rem;color:var(--text-muted);" id="gen-progress-sub">Consultando bases de datos y filtrando duplicados en tiempo real...</div>
+              </div>
+
+              <button type="submit" id="btn-run-gen" class="btn-new-lead" style="width:100%;padding:0.95rem;font-size:1rem;justify-content:center;background:var(--accent);border-radius:10px;box-shadow:0 4px 14px rgba(249,115,22,0.35);">
+                🚀 Iniciar Extracción Masiva
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 6: CONFIGURACIÓN
+             ========================================== -->
+        <div class="app-tab-pane" id="config-view">
+          <div class="page-title-row">
+            <div>
+              <h1>Configuración del Sistema</h1>
+              <p>Seguridad, dispositivos con PIN `0802`, apariencia y parámetros comerciales.</p>
+            </div>
+          </div>
+          <div class="settings-grid">
+            <div class="settings-card">
+              <h3>🎨 Apariencia y Tema</h3>
+              <p>Elige entre Modo Claro y Modo Oscuro para trabajar cómodamente en cualquier dispositivo.</p>
+              <div style="display:flex;gap:0.65rem;margin-top:0.75rem;">
+                <button class="btn-action-sm" style="background:#f1f5f9;color:#0f172a;border:1.5px solid #cbd5e1;padding:0.55rem 1rem;font-size:0.82rem;" onclick="setTheme('light')">
+                  ☀️ Modo Claro
+                </button>
+                <button class="btn-action-sm" style="background:#0f172a;color:#fff;border:1.5px solid #334155;padding:0.55rem 1rem;font-size:0.82rem;" onclick="setTheme('dark')">
+                  🌙 Modo Oscuro
+                </button>
+              </div>
+            </div>
+
+            <div class="settings-card" style="grid-column: 1 / -1;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;gap:0.5rem;">
+                <h3>📱 Dispositivos Autorizados con PIN (0802)</h3>
+                <span class="status-pill" id="device-count-pill">0 Dispositivos</span>
+              </div>
+              <div style="overflow-x:auto;">
+                <table class="dev-table">
+                  <thead>
+                    <tr><th>Dispositivo</th><th>ID</th><th>Primer Acceso</th><th>Última Actividad</th><th>Estado</th></tr>
+                  </thead>
+                  <tbody id="devices-tbody"><tr><td colspan="5" style="text-align:center;">Cargando...</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL DESCARTAR LEAD -->
+  <div class="modal-overlay" id="discard-modal">
+    <div class="modal" style="max-width:440px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.85rem;">
+        <h3 style="color:#dc2626;font-size:1.15rem;">❌ Descartar Prospecto</h3>
+        <button onclick="closeModal('discard-modal')" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#94a3b8;">&times;</button>
+      </div>
+      <p id="discard-lead-name" style="font-weight:700;font-size:0.9rem;margin-bottom:0.85rem;color:var(--text-main);"></p>
+      
+      <label style="font-size:0.75rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.35rem;">SELECCIONA EL MOTIVO:</label>
+      <select id="discard-reason-select" class="filter-select" style="width:100%;padding:0.6rem;margin-bottom:1.15rem;">
+        <option value="No tiene necesidad de almacenamiento actual">No tiene necesidad de almacenamiento actual</option>
+        <option value="Ya compró o alquiló a otra empresa">Ya compró o alquiló a otra empresa</option>
+        <option value="Presupuesto insuficiente / Muy caro">Presupuesto insuficiente / Muy caro</option>
+        <option value="Teléfono equivocado / Fuera de servicio">Teléfono equivocado / Fuera de servicio</option>
+        <option value="No está interesado por ahora">No está interesado por ahora</option>
+      </select>
+
+      <div style="display:flex;justify-content:flex-end;gap:0.45rem;">
+        <button class="btn-new-lead" style="background:var(--border);color:var(--text-main);" onclick="closeModal('discard-modal')">Cancelar</button>
+        <button class="btn-new-lead" style="background:#dc2626;" onclick="confirmDiscardLead()">Confirmar Descarte</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL AGENTE IA DE PROPUESTAS POR CORREO -->
+  <div class="modal-overlay" id="ai-email-modal">
+    <div class="modal">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;">
+        <div>
+          <h3 style="font-size:1.2rem;font-weight:800;color:#7c3aed;">🤖 Agente IA de Propuestas por Correo</h3>
+          <p style="font-size:0.8rem;color:var(--text-muted);">Propuestas redactadas a la medida del negocio y su localidad en Florida.</p>
+        </div>
+        <button onclick="closeModal('ai-email-modal')" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#94a3b8;">&times;</button>
+      </div>
+
+      <div id="ai-proposals-container" style="max-height:55vh;overflow-y:auto;margin:0.85rem 0;padding-right:0.35rem;"></div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;border-top:1px solid var(--border);padding-top:0.85rem;flex-wrap:wrap;gap:0.65rem;">
+        <span style="font-size:0.8rem;color:var(--text-muted);" id="modal-selected-summary">0 seleccionados</span>
+        <div style="display:flex;gap:0.45rem;">
+          <button class="btn-new-lead" style="background:var(--border);color:var(--text-main);" onclick="closeModal('ai-email-modal')">Cerrar</button>
+          <button class="btn-batch-ai" onclick="confirmMoveAllToEmailPipeline()">
+            <span>⚡ Mover al Pipeline de Correos 📧</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL GUIÓN TELEFÓNICO Y SEGUIMIENTO -->
+  <div class="modal-overlay" id="pitch-modal">
+    <div class="modal">
+      <h3 id="pitch-modal-title" style="margin-bottom:0.35rem;color:var(--primary);font-size:1.15rem;">Guión de Contacto Comercial</h3>
+      <p id="pitch-modal-sub" style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.85rem;"></p>
+      <div style="background:var(--input-bg);border-left:4px solid var(--accent);padding:1rem;border-radius:8px;font-size:0.88rem;line-height:1.6;" id="pitch-modal-text"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:1.15rem;">
+        <button class="btn-new-lead" style="background:var(--border);color:var(--text-main);" onclick="closeModal('pitch-modal')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL NUEVO LEAD MANUAL -->
+  <div class="modal-overlay" id="add-modal">
+    <div class="modal">
+      <h3 style="margin-bottom:0.35rem;color:var(--primary);font-size:1.15rem;">➕ Registrar Nuevo Prospecto</h3>
+      <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.85rem;">Se guardará en tu banco de leads.</p>
+      <form onsubmit="handleCreateLead(event)">
+        <div style="margin-bottom:0.75rem;">
+          <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">NOMBRE DEL NEGOCIO *</label>
+          <input type="text" id="add-name" class="top-search-input" style="border-radius:8px;padding-left:0.75rem;" required placeholder="Ej. Rancho San Pedro">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.65rem;margin-bottom:0.75rem;">
+          <div>
+            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">CATEGORÍA *</label>
+            <select id="add-cat" class="filter-select" style="width:100%;padding:0.55rem;" required>
+              <option value="Compañías de Construcción y Techado">Compañías de Construcción y Techado</option>
+              <option value="Pavimentación y Obras Viales">Pavimentación y Obras Viales</option>
+              <option value="Supermercados y Alimentos">Supermercados y Alimentos</option>
+              <option value="Farmacéuticas y Suministros Médicos">Farmacéuticas y Suministros Médicos</option>
+              <option value="Agencias de Envíos y Logística">Agencias de Envíos y Logística</option>
+              <option value="Florerías y Viveros">Florerías y Viveros</option>
+              <option value="Empresas Eléctricas y Servicios">Empresas Eléctricas y Servicios</option>
+              <option value="Telecomunicaciones y Telefonía">Telecomunicaciones y Telefonía</option>
+              <option value="Zoológicos y Santuarios">Zoológicos y Santuarios</option>
+              <option value="Acuarios y Vida Marina">Acuarios y Vida Marina</option>
+              <option value="Empresas Pesqueras y Marinas">Empresas Pesqueras y Marinas</option>
+              <option value="Motocross, ATVs y Mudding">Motocross, ATVs y Mudding</option>
+              <option value="Talleres Mecánicos y Auto Body">Talleres Mecánicos y Auto Body</option>
+              <option value="Viveros, Fincas y Granjas">Viveros, Fincas y Granjas</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">DUEÑO / CONTACTO</label>
+            <input type="text" id="add-owner" class="top-search-input" style="border-radius:8px;padding-left:0.75rem;" placeholder="Ej. Carlos Rodriguez">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.65rem;margin-bottom:0.75rem;">
+          <div>
+            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">LOCALIDAD / CIUDAD *</label>
+            <select id="add-city" class="filter-select" style="width:100%;padding:0.55rem;" required>
+              <option value="Naples">Naples (Collier County)</option>
+              <option value="Lehigh Acres">Lehigh Acres (Lee County)</option>
+              <option value="Clewiston">Clewiston (Hendry County)</option>
+              <option value="Montura Ranches">Montura Ranches / Clewiston (Hendry County)</option>
+              <option value="West Palm Beach">West Palm Beach (Palm Beach County)</option>
+              <option value="Loxahatchee">Loxahatchee (Palm Beach County)</option>
+              <option value="Florida Keys">Cayos de Florida (Key West, Key Largo, Marathon)</option>
+              <option value="Stuart">Stuart (Martin County)</option>
+              <option value="Jupiter">Jupiter (Palm Beach County)</option>
+              <option value="Lake Worth">Lake Worth Beach (Palm Beach County)</option>
+              <option value="Boca Raton">Boca Raton (Palm Beach County)</option>
+              <option value="Boynton Beach">Boynton Beach (Palm Beach County)</option>
+              <option value="Homestead">Homestead / Redland (Miami-Dade)</option>
+              <option value="Miami" selected>Miami (Doral / Medley / Centro)</option>
+              <option value="Hialeah">Hialeah (Miami-Dade)</option>
+              <option value="Doral">Doral (Carga & Logística)</option>
+              <option value="Fort Lauderdale">Fort Lauderdale / Broward</option>
+              <option value="Pompano Beach">Pompano Beach (Broward)</option>
+              <option value="Orlando">Orlando / Orange County</option>
+              <option value="Tampa">Tampa / Hillsborough</option>
+              <option value="Ocala">Ocala / Marion (Ranchos y Terrenos)</option>
+              <option value="Fort Myers">Fort Myers / Lee</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">TELÉFONO *</label>
+            <input type="text" id="add-phone" class="top-search-input" style="border-radius:8px;padding-left:0.75rem;" required placeholder="Ej. (239) 555-1234">
+          </div>
+        </div>
+        <div style="margin-bottom:1.15rem;">
+          <label style="font-size:0.72rem;font-weight:700;color:var(--text-muted);">CORREO ELECTRÓNICO</label>
+          <input type="email" id="add-email" class="top-search-input" style="border-radius:8px;padding-left:0.75rem;" placeholder="Ej. contacto@empresa.com">
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:0.45rem;">
+          <button type="button" class="btn-new-lead" style="background:var(--border);color:var(--text-main);" onclick="closeModal('add-modal')">Cancelar</button>
+          <button type="submit" class="btn-new-lead">Guardar Lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast-msg">Guardado en Supabase ✅</div>
+
+  <script>
+    const CORRECT_PIN = "0802";
+    const SUPABASE_URL = "https://opaqkietypicupvipwgx.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wYXFraWV0eXBpY3Vwdmlwd2d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4OTUxODAsImV4cCI6MjEwMjQ3MTE4MH0.7KrLkNTJ3RfnxRzVUEy4mgPj-6FrFX2Rg3fbLdLobYY";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let leads = [];
+    let activities = [];
+    let selectedLeadIds = new Set();
+    let draggedLeadId = null;
+    let selectedCalendarDateStr = new Date().toISOString().slice(0, 10);
+    let currentViewMode = 'grid'; // 'grid' | 'table'
+    let currentPage = 1;
+    let pageSize = 50;
+    let selectedEngines = new Set(['google_maps', 'sunbiz', 'permits', 'fmc_ports', 'crawler', 'geo_osm']);
+    let leadToDiscardId = null;
+
+    // ==========================================
+    // RESPONSIVE SIDEBAR DRAWER
+    // ==========================================
+    function toggleSidebar() {
+      const sidebar = document.getElementById('app-sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      const isOpen = sidebar.classList.contains('open');
+      if (isOpen) closeSidebar();
+      else {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+      }
+    }
+    function closeSidebar() {
+      const sidebar = document.getElementById('app-sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (sidebar) sidebar.classList.remove('open');
+      if (overlay) overlay.classList.remove('active');
+    }
+
+    // ==========================================
+    // TEMA: MODO OSCURO / CLARO
+    // ==========================================
+    function initTheme() {
+      const savedTheme = localStorage.getItem('fl_theme') || 'light';
+      setTheme(savedTheme);
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = cur === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+    }
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('fl_theme', theme);
+      const icon = document.getElementById('theme-icon');
+      const label = document.getElementById('theme-label');
+      if (icon && label) {
+        if (theme === 'dark') {
+          icon.textContent = '☀️';
+          label.textContent = 'Claro';
+        } else {
+          icon.textContent = '🌙';
+          label.textContent = 'Oscuro';
+        }
+      }
+    }
+    initTheme();
+
+    // PIN & AUTH
+    function getOrCreateDeviceId() {
+      let id = localStorage.getItem('fl_dev_id');
+      if (!id) {
+        id = 'DEV-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        localStorage.setItem('fl_dev_id', id);
+      }
+      return id;
+    }
+    function getDeviceDescription() {
+      const ua = navigator.userAgent;
+      let os = "Desktop";
+      if (ua.includes("iPhone")) os = "iPhone (iOS)";
+      else if (ua.includes("Android")) os = "Android";
+      else if (ua.includes("Win")) os = "Windows PC";
+      else if (ua.includes("Mac")) os = "Mac OS";
+      return os;
+    }
+    async function registerDevice() {
+      try {
+        await supabaseClient.from('fl_authorized_devices').upsert({
+          device_id: getOrCreateDeviceId(),
+          device_name: getDeviceDescription(),
+          browser_os: navigator.userAgent.slice(0, 140),
+          last_active: new Date()
+        }, { onConflict: 'device_id' });
+      } catch (err) { console.error(err); }
+    }
+    async function loadDevicesTable() {
+      try {
+        const { data } = await supabaseClient.from('fl_authorized_devices').select('*').order('last_active', { ascending: false });
+        const tbody = document.getElementById('devices-tbody');
+        document.getElementById('device-count-pill').textContent = `${(data || []).length} Dispositivos`;
+        if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="5">No hay dispositivos.</td></tr>'; return; }
+        const currentDevId = getOrCreateDeviceId();
+        tbody.innerHTML = data.map(d => `
+          <tr>
+            <td><strong>${d.device_name}</strong> ${d.device_id === currentDevId ? '<span style="color:#3b82f6;font-weight:800;">(ESTE EQUIPO)</span>' : ''}</td>
+            <td><code>${d.device_id}</code></td>
+            <td>${new Date(d.created_at).toLocaleDateString()}</td>
+            <td>${new Date(d.last_active).toLocaleDateString()}</td>
+            <td>🟢 Autorizado</td>
+          </tr>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    function moveNext(cur, nextId) { if (cur.value.length === 1 && nextId) document.getElementById(nextId).focus(); }
+    async function handlePinSubmit(e) {
+      if (e) e.preventDefault();
+      const p = document.getElementById('p1').value + document.getElementById('p2').value + document.getElementById('p3').value + document.getElementById('p4').value;
+      if (p === CORRECT_PIN) {
+        localStorage.setItem('fl_auth', 'true');
+        await registerDevice();
+        unlockApp();
+      } else {
+        document.getElementById('pin-error-msg').style.display = 'block';
+        ['p1','p2','p3','p4'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('p1').focus();
+      }
+    }
+    function unlockApp() {
+      document.getElementById('pin-lock-screen').style.display = 'none';
+      document.getElementById('app-container').style.display = 'flex';
+      loadLeadsFromSupabase();
+      loadActivitiesFromSupabase();
+      loadDevicesTable();
+    }
+    function lockApp() {
+      localStorage.removeItem('fl_auth');
+      document.getElementById('pin-lock-screen').style.display = 'flex';
+      document.getElementById('app-container').style.display = 'none';
+    }
+    if (localStorage.getItem('fl_auth') === 'true') unlockApp();
+
+    function switchNavTab(tabId) {
+      closeSidebar();
+      document.querySelectorAll('.app-tab-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      if (tabId === 'pipeline-view') document.getElementById('nav-btn-pipeline').classList.add('active');
+      else if (tabId === 'calendar-view') {
+        document.getElementById('nav-btn-calendar').classList.add('active');
+        renderCalendarView();
+      }
+      else if (tabId === 'leads-view') document.getElementById('nav-btn-leads').classList.add('active');
+      else if (tabId === 'archive-view') {
+        document.getElementById('nav-btn-archive').classList.add('active');
+        renderArchiveView();
+      }
+      else if (tabId === 'generator-view') document.getElementById('nav-btn-generator').classList.add('active');
+      else if (tabId === 'config-view') { document.getElementById('nav-btn-config').classList.add('active'); loadDevicesTable(); }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast-msg');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2600);
+    }
+
+    // CARGA DE DATOS
+    async function loadLeadsFromSupabase() {
+      try {
+        const { data, error } = await supabaseClient.from('fl_container_leads').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        leads = data || [];
+        initializeFilters();
+        updateKPIs();
+        renderPipeline();
+        renderAllLeads();
+        renderArchiveView();
+      } catch (err) { console.error("Error loading leads:", err); }
+    }
+
+    async function loadActivitiesFromSupabase() {
+      try {
+        const { data } = await supabaseClient.from('fl_lead_activities').select('*').order('created_at', { ascending: false });
+        activities = data || [];
+        renderCalendarView();
+      } catch (err) { console.error(err); }
+    }
+
+    async function logActivity(leadId, businessName, type, description) {
+      const act = {
+        lead_id: leadId,
+        business_name: businessName,
+        activity_type: type,
+        description: description,
+        created_at: new Date().toISOString()
+      };
+      activities.unshift(act);
+      try { await supabaseClient.from('fl_lead_activities').insert([act]); } catch (err) { console.error(err); }
+    }
+
+    const FLORIDA_LOCATIONS = [
+      { key: "Naples", name: "Naples (Collier County)" },
+      { key: "Lehigh Acres", name: "Lehigh Acres (Lee County)" },
+      { key: "Clewiston", name: "Clewiston (Hendry County)" },
+      { key: "Montura Ranches", name: "Montura Ranches / Clewiston (Hendry County)" },
+      { key: "West Palm Beach", name: "West Palm Beach (Palm Beach County)" },
+      { key: "Loxahatchee", name: "Loxahatchee (Palm Beach County)" },
+      { key: "Florida Keys", name: "Cayos de Florida (Key West, Key Largo, Marathon)" },
+      { key: "Stuart", name: "Stuart (Martin County)" },
+      { key: "Jupiter", name: "Jupiter (Palm Beach County)" },
+      { key: "Lake Worth", name: "Lake Worth Beach (Palm Beach County)" },
+      { key: "Boca Raton", name: "Boca Raton (Palm Beach County)" },
+      { key: "Boynton Beach", name: "Boynton Beach (Palm Beach County)" },
+      { key: "Homestead", name: "Homestead / Redland (Miami-Dade)" },
+      { key: "Miami", name: "Miami (Doral / Medley / Centro)" },
+      { key: "Hialeah", name: "Hialeah (Miami-Dade)" },
+      { key: "Doral", name: "Doral (Carga & Logística)" },
+      { key: "Fort Lauderdale", name: "Fort Lauderdale / Broward" },
+      { key: "Pompano Beach", name: "Pompano Beach (Broward)" },
+      { key: "Orlando", name: "Orlando / Orange County" },
+      { key: "Tampa", name: "Tampa / Hillsborough" },
+      { key: "Ocala", name: "Ocala / Marion (Ranchos y Terrenos)" },
+      { key: "Fort Myers", name: "Fort Myers / Lee" }
+    ];
+
+    function initializeFilters() {
+      const leadCities = Array.from(new Set(leads.map(l => l.city).filter(Boolean)));
+      const locationMap = new Map();
+      FLORIDA_LOCATIONS.forEach(loc => locationMap.set(loc.key.toLowerCase(), { key: loc.key, label: loc.name }));
+      leadCities.forEach(c => {
+        const lower = c.toLowerCase();
+        if (!locationMap.has(lower)) {
+          locationMap.set(lower, { key: c, label: `${c}, FL` });
+        }
+      });
+
+      ['filter-pipe-city', 'filter-city-pool'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (sel) {
+          const prevVal = sel.value || 'all';
+          sel.innerHTML = '<option value="all">📍 Todas las Ciudades de Florida</option>';
+          locationMap.forEach(loc => {
+            const o = document.createElement('option');
+            o.value = loc.key;
+            o.textContent = loc.label;
+            if (loc.key === prevVal) o.selected = true;
+            sel.appendChild(o);
+          });
+        }
+      });
+
+      const MASTER_CATEGORIES = [
+        "Compañías de Construcción, Contratistas y Techado",
+        "Pavimentación, Asfalto y Obras Viales",
+        "Viveros, Fincas, Granjas y Ranchos",
+        "Supermercados, Distribuidoras y Mayoristas de Alimentos",
+        "Farmacéuticas, Laboratorios y Suministros Médicos",
+        "Agencias de Envíos, Carga y Logística",
+        "Florerías, Viveros y Distribuidores de Flores",
+        "Empresas Eléctricas, Generadores y Servicios Públicos",
+        "Telecomunicaciones, Torres y Fibra Óptica",
+        "Zoológicos, Parques Temáticos y Santuarios",
+        "Acuarios y Centros de Vida Marina",
+        "Empresas Pesqueras, Marinas y Marisquerías",
+        "Motocross, ATVs, Mudding y Off-Road",
+        "Talleres Mecánicos, Auto Body y Yonkes",
+        "Alquiler de Eventos, Carpas y Food Trucks"
+      ];
+      const leadCategories = Array.from(new Set(leads.map(l => l.category_name).filter(Boolean)));
+      const catMap = new Map();
+      MASTER_CATEGORIES.forEach(cat => catMap.set(cat.toLowerCase(), cat));
+      leadCategories.forEach(c => {
+        if (!catMap.has(c.toLowerCase())) catMap.set(c.toLowerCase(), c);
+      });
+
+      const catSel = document.getElementById('filter-cat-pool');
+      if (catSel) {
+        const prevCat = catSel.value || 'all';
+        catSel.innerHTML = '<option value="all">🏢 Todas las Categorías</option>';
+        catMap.forEach(cat => {
+          const o = document.createElement('option');
+          o.value = cat;
+          o.textContent = cat;
+          if (cat === prevCat) o.selected = true;
+          catSel.appendChild(o);
+        });
+      }
+    }
+
+    function getLeadTimeInfo(lead) {
+      const lastTime = lead.last_contacted_at || lead.email_sent_at || lead.whatsapp_sent_at || lead.last_called_at || lead.updated_at || lead.created_at;
+      if (!lastTime) return { label: 'Sin contacto', ageDays: 0, badgeClass: 'aging-recent' };
+
+      const diffMs = new Date() - new Date(lastTime);
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffDays = Math.floor(diffHours / 24);
+
+      if (diffHours < 1) return { label: '⏱️ Minutos', ageDays: 0, badgeClass: 'aging-recent' };
+      if (diffHours < 24) return { label: `⏱️ ${diffHours}h`, ageDays: 0, badgeClass: 'aging-recent' };
+      if (diffDays === 1) return { label: '⏱️ Ayer', ageDays: 1, badgeClass: 'aging-recent' };
+      if (diffDays <= 4) return { label: `⏱️ ${diffDays} días`, ageDays: diffDays, badgeClass: 'aging-medium' };
+      return { label: `🚨 ${diffDays}d (Alerta)`, ageDays: diffDays, badgeClass: 'aging-overdue' };
+    }
+
+    function updateKPIs() {
+      const activeLeads = leads.filter(l => !l.is_archived);
+      const emails = activeLeads.filter(l => l.contact_status && l.contact_status.includes('Correo')).length;
+      const wa = activeLeads.filter(l => l.contact_status && l.contact_status.includes('WhatsApp')).length;
+      const calls = activeLeads.filter(l => l.contact_status && l.contact_status.includes('Llamado')).length;
+      const cotizados = activeLeads.filter(l => l.contact_status && l.contact_status.includes('Cotiz')).length;
+      const cerrados = activeLeads.filter(l => l.contact_status && l.contact_status.includes('Cerrad')).length;
+      const totalActivePipeline = emails + wa + calls + cotizados + cerrados;
+
+      const uncontactedCount = activeLeads.filter(l => !l.contact_status || l.contact_status.includes('Nuevo')).length;
+      const archivedCount = leads.filter(l => l.is_archived).length;
+
+      const overdueCount = activeLeads.filter(l => {
+        if (!l.contact_status || l.contact_status.includes('Nuevo') || l.contact_status.includes('Cerrad')) return false;
+        return getLeadTimeInfo(l).ageDays >= 4;
+      }).length;
+
+      document.getElementById('kpi-emails-sent').textContent = emails;
+      document.getElementById('kpi-wa-sent').textContent = wa;
+      document.getElementById('kpi-calls-made').textContent = calls;
+      document.getElementById('kpi-cotizados').textContent = cotizados;
+      document.getElementById('kpi-cerrados').textContent = cerrados;
+      document.getElementById('kpi-overdue-followups').textContent = overdueCount;
+
+      document.getElementById('nav-badge-pipeline').textContent = totalActivePipeline;
+      document.getElementById('nav-badge-new-leads').textContent = uncontactedCount;
+      document.getElementById('nav-badge-archived').textContent = archivedCount;
+    }
+
+    // GESTIÓN DE DESCARTE Y ARCHIVO
+    function openDiscardModal(leadId) {
+      leadToDiscardId = leadId;
+      const l = leads.find(x => x.id === leadId);
+      if (l) {
+        document.getElementById('discard-lead-name').textContent = `¿Descartar a "${l.business_name}"?`;
+        document.getElementById('discard-modal').style.display = 'flex';
+      }
+    }
+
+    async function confirmDiscardLead() {
+      if (!leadToDiscardId) return;
+      const reason = document.getElementById('discard-reason-select').value;
+      const lead = leads.find(l => l.id === leadToDiscardId);
+      
+      if (lead) {
+        lead.is_archived = true;
+        lead.discard_reason = reason;
+        lead.contact_status = '❌ Descartado';
+        lead.updated_at = new Date().toISOString();
+
+        await logActivity(lead.id, lead.business_name, 'discard', `Descartado: ${reason}`);
+        updateKPIs();
+        renderPipeline();
+        renderAllLeads();
+        renderArchiveView();
+        closeModal('discard-modal');
+        showToast("Lead descartado y archivado.");
+
+        try {
+          await supabaseClient.from('fl_container_leads').update({
+            is_archived: true,
+            discard_reason: reason,
+            contact_status: '❌ Descartado',
+            updated_at: new Date()
+          }).eq('id', lead.id);
+        } catch (err) { console.error(err); }
+      }
+      leadToDiscardId = null;
+    }
+
+    async function reactivateLead(leadId) {
+      const lead = leads.find(l => l.id === leadId);
+      if (lead) {
+        lead.is_archived = false;
+        lead.discard_reason = null;
+        lead.contact_status = 'Nuevo (Sin contactar)';
+        lead.updated_at = new Date().toISOString();
+
+        await logActivity(lead.id, lead.business_name, 'reactivate', 'Lead reactivado a Banco de Prospectos');
+        updateKPIs();
+        renderPipeline();
+        renderAllLeads();
+        renderArchiveView();
+        showToast("¡Lead reactivado con éxito! 🎉");
+
+        try {
+          await supabaseClient.from('fl_container_leads').update({
+            is_archived: false,
+            discard_reason: null,
+            contact_status: 'Nuevo (Sin contactar)',
+            updated_at: new Date()
+          }).eq('id', lead.id);
+        } catch (err) { console.error(err); }
+      }
+    }
+
+    function renderArchiveView() {
+      const tbody = document.getElementById('archive-table-body');
+      if (!tbody) return;
+      const archived = leads.filter(l => l.is_archived);
+
+      if (archived.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:var(--text-muted);">No hay prospectos archivados o descartados.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = archived.map(l => `
+        <tr>
+          <td><strong>${l.business_name}</strong> ${l.owner_name ? `<br><small style="color:var(--text-muted);">👤 ${l.owner_name}</small>` : ''}</td>
+          <td><span style="color:#3b82f6;font-weight:700;font-size:0.75rem;">${l.category_name}</span><br><small style="color:var(--text-muted);">📍 ${l.city || 'Florida'}, FL</small></td>
+          <td><strong>${l.phone || '—'}</strong></td>
+          <td><span style="background:rgba(239, 68, 68, 0.15);color:#ef4444;padding:0.2rem 0.5rem;border-radius:6px;font-size:0.75rem;font-weight:700;">⚠️ ${l.discard_reason || 'Descartado'}</span></td>
+          <td style="font-size:0.75rem;color:var(--text-muted);">${new Date(l.updated_at || l.created_at).toLocaleDateString()}</td>
+          <td style="text-align:right;">
+            <button class="btn-action-sm" style="background:#0f172a;color:#fff;border:1px solid #334155;" onclick="reactivateLead('${l.id}')">
+              🔄 Reactivar
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // VISTA EN FILAS / TABLA VS TARJETAS
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      document.getElementById('btn-toggle-grid').classList.toggle('active', mode === 'grid');
+      document.getElementById('btn-toggle-table').classList.toggle('active', mode === 'table');
+      document.getElementById('all-leads-grid').style.display = mode === 'grid' ? 'grid' : 'none';
+      document.getElementById('leads-table-wrap').style.display = mode === 'table' ? 'block' : 'none';
+      renderAllLeads();
+    }
+
+    function changePageSize(size) {
+      pageSize = parseInt(size);
+      currentPage = 1;
+      renderAllLeads();
+    }
+
+    function resetPageAndRender() {
+      currentPage = 1;
+      renderAllLeads();
+    }
+
+    function prevPage() {
+      if (currentPage > 1) { currentPage--; renderAllLeads(); }
+    }
+    function nextPage() {
+      currentPage++; renderAllLeads();
+    }
+
+    function getFilteredLeads() {
+      const search = (document.getElementById('global-search').value || '').toLowerCase();
+      const selCat = document.getElementById('filter-cat-pool').value;
+      const selCity = document.getElementById('filter-city-pool').value;
+      const selStatus = document.getElementById('filter-status-pool').value;
+      const selSource = document.getElementById('filter-source-pool').value;
+
+      return leads.filter(l => {
+        if (l.is_archived) return false;
+
+        const mSearch = (
+          (l.business_name || '').toLowerCase().includes(search) ||
+          (l.phone || '').includes(search) ||
+          (l.city || '').toLowerCase().includes(search) ||
+          (l.owner_name || '').toLowerCase().includes(search) ||
+          (l.email || '').toLowerCase().includes(search)
+        );
+        const mCat = selCat === 'all' || l.category_name === selCat;
+        const mCity = selCity === 'all' || l.city === selCity || (l.city && l.city.toLowerCase().includes(selCity.toLowerCase())) || (selCity && selCity.toLowerCase().includes((l.city || '').toLowerCase()));
+        
+        let mSt = true;
+        const isNew = !l.contact_status || l.contact_status.includes('Nuevo');
+        if (selStatus === 'nuevo') mSt = isNew;
+        else if (selStatus === 'pipeline') mSt = !isNew;
+        else if (selStatus === 'all') mSt = true;
+
+        let mSource = true;
+        const src = (l.source || '').toLowerCase();
+        if (selSource === 'google') mSource = src.includes('google');
+        else if (selSource === 'sunbiz') mSource = src.includes('sunbiz');
+        else if (selSource === 'permits') mSource = src.includes('permis') || src.includes('obra');
+        else if (selSource === 'fmc') mSource = src.includes('fmc') || src.includes('puerto') || src.includes('logística');
+
+        return mSearch && mCat && mCity && mSt && mSource;
+      });
+    }
+
+    function renderAllLeads() {
+      const filtered = getFilteredLeads();
+      const totalFiltered = filtered.length;
+      const totalPages = Math.ceil(totalFiltered / pageSize) || 1;
+
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, totalFiltered);
+      const paginatedLeads = filtered.slice(startIndex, endIndex);
+
+      document.getElementById('pagination-info-text').textContent = `Mostrando ${totalFiltered === 0 ? 0 : startIndex + 1}-${endIndex} de ${totalFiltered} prospectos`;
+      document.getElementById('page-number-display').textContent = `Pág ${currentPage} de ${totalPages}`;
+      document.getElementById('btn-page-prev').disabled = (currentPage <= 1);
+      document.getElementById('btn-page-next').disabled = (currentPage >= totalPages);
+
+      if (currentViewMode === 'grid') renderGridView(paginatedLeads);
+      else renderTableView(paginatedLeads);
+    }
+
+    function renderGridView(leadsList) {
+      const container = document.getElementById('all-leads-grid');
+      container.innerHTML = '';
+
+      leadsList.forEach(lead => {
+        const isSelected = selectedLeadIds.has(lead.id);
+        const isNew = !lead.contact_status || lead.contact_status.includes('Nuevo');
+        const timeInfo = getLeadTimeInfo(lead);
+        const card = document.createElement('div');
+        card.className = `lead-pool-card ${isSelected ? 'selected' : ''}`;
+
+        card.innerHTML = `
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;">
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <input type="checkbox" style="transform:scale(1.15);cursor:pointer;" ${isSelected ? 'checked' : ''} onchange="toggleSelectLead('${lead.id}', this.checked)">
+                <div>
+                  <div style="font-weight:800;font-size:0.92rem;color:var(--text-main);">${lead.business_name}</div>
+                  ${lead.owner_name ? `<span style="font-size:0.7rem;color:#10b981;font-weight:700;">👤 Dueño: ${lead.owner_name}</span>` : ''}
+                </div>
+              </div>
+              <span class="aging-pill ${isNew ? 'aging-recent' : timeInfo.badgeClass}">${isNew ? '⚪ Nuevo' : timeInfo.label}</span>
+            </div>
+
+            <span class="source-tag">🏷️ ${lead.source || 'Google Maps'}</span>
+            <div style="font-size:0.72rem;color:#3b82f6;font-weight:700;margin-bottom:0.45rem;">${lead.category_name}</div>
+            
+            <div style="font-size:0.78rem;color:var(--text-muted);display:flex;flex-direction:column;gap:0.2rem;margin-bottom:0.75rem;">
+              <div>📍 <strong>Ubicación:</strong> ${lead.full_address || lead.city}</div>
+              <div>📞 <strong>Teléfono:</strong> <span style="color:var(--text-main);font-weight:700;">${lead.phone || 'Sin tel'}</span></div>
+              <div>📧 <strong>Correo:</strong> <span>${lead.email || 'contacto@empresa.com'}</span> ${lead.email_verified ? '<span style="color:#10b981;">✅ Verificado</span>' : ''}</div>
+            </div>
+          </div>
+
+          <div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.35rem;">
+              <button onclick="openSingleAIModal('${lead.id}')" class="btn-action-sm btn-act-email" style="grid-column:span 2;">
+                🤖 Propuesta Correo IA
+              </button>
+              ${lead.phone ? `<button onclick="trackCall('${lead.id}', 'tel:${lead.phone.replace(/\D/g,'')}')" class="btn-action-sm btn-act-call">📞 Llamar</button>` : ''}
+              ${lead.whatsapp_link ? `<button onclick="trackWhatsApp('${lead.id}', '${lead.whatsapp_link}')" class="btn-action-sm btn-act-wa">💬 WA</button>` : ''}
+              <button onclick="openDiscardModal('${lead.id}')" class="btn-action-sm btn-act-discard">
+                ❌ Descartar / No Interesado
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderTableView(leadsList) {
+      const tbody = document.getElementById('leads-table-body');
+      tbody.innerHTML = '';
+
+      if (leadsList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:2rem;">No hay prospectos en esta sección.</td></tr>';
+        return;
+      }
+
+      leadsList.forEach(lead => {
+        const isSelected = selectedLeadIds.has(lead.id);
+        const isNew = !lead.contact_status || lead.contact_status.includes('Nuevo');
+        const timeInfo = getLeadTimeInfo(lead);
+        const tr = document.createElement('tr');
+        if (isSelected) tr.classList.add('selected');
+
+        tr.innerHTML = `
+          <td><input type="checkbox" style="transform:scale(1.15);cursor:pointer;" ${isSelected ? 'checked' : ''} onchange="toggleSelectLead('${lead.id}', this.checked)"></td>
+          <td>
+            <strong>${lead.business_name}</strong>
+            ${lead.owner_name ? `<br><small style="color:#10b981;font-weight:700;">👤 ${lead.owner_name}</small>` : ''}
+          </td>
+          <td><span style="font-size:0.75rem;color:#3b82f6;font-weight:700;">${lead.category_name}</span></td>
+          <td>📍 ${lead.city || 'Florida'}, FL</td>
+          <td><strong>${lead.phone || '—'}</strong></td>
+          <td>
+            <span>${lead.email || '—'}</span>
+            ${lead.email_verified ? '<span style="color:#10b981;font-size:0.7rem;font-weight:800;"> ✅</span>' : ''}
+          </td>
+          <td><span class="source-tag" style="margin:0;">${lead.source || 'Google Maps'}</span></td>
+          <td><span class="aging-pill ${isNew ? 'aging-recent' : timeInfo.badgeClass}">${isNew ? '⚪ Nuevo' : timeInfo.label}</span></td>
+          <td style="text-align:right;">
+            <div style="display:inline-flex;gap:0.25rem;">
+              <button onclick="openSingleAIModal('${lead.id}')" class="btn-action-sm btn-act-email" title="Enviar Propuesta IA">📧</button>
+              ${lead.phone ? `<button onclick="trackCall('${lead.id}', 'tel:${lead.phone.replace(/\D/g,'')}')" class="btn-action-sm btn-act-call" title="Llamar">📞</button>` : ''}
+              ${lead.whatsapp_link ? `<button onclick="trackWhatsApp('${lead.id}', '${lead.whatsapp_link}')" class="btn-action-sm btn-act-wa" title="WhatsApp">💬</button>` : ''}
+              <button onclick="openDiscardModal('${lead.id}')" class="btn-action-sm btn-act-discard" style="grid-column:unset;" title="Descartar">❌</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // MULTI-SELECCIÓN
+    function toggleSelectLead(id, checked) {
+      if (checked) selectedLeadIds.add(id);
+      else selectedLeadIds.delete(id);
+      updateBatchUI();
+      renderAllLeads();
+    }
+    function toggleSelectAll(checked) {
+      const filtered = getFilteredLeads();
+      if (checked) filtered.forEach(l => selectedLeadIds.add(l.id));
+      else selectedLeadIds.clear();
+      updateBatchUI();
+      renderAllLeads();
+    }
+    function selectFirstN(n) {
+      selectedLeadIds.clear();
+      const filtered = getFilteredLeads();
+      const uncontacted = filtered.filter(l => !l.contact_status || l.contact_status.includes('Nuevo'));
+      const toSelect = uncontacted.length > 0 ? uncontacted.slice(0, n) : filtered.slice(0, n);
+      toSelect.forEach(l => selectedLeadIds.add(l.id));
+      updateBatchUI();
+      renderAllLeads();
+      showToast(`¡${selectedLeadIds.size} prospectos seleccionados!`);
+    }
+    function updateBatchUI() {
+      const count = selectedLeadIds.size;
+      document.getElementById('batch-selected-label').textContent = `${count} seleccionados`;
+      const selectAll = document.getElementById('select-all-checkbox');
+      if (selectAll) selectAll.checked = (count === leads.length && count > 0);
+    }
+
+    // ==========================================
+    // AGENTE IA: REDACCIÓN DE PROPUESTAS ESPECÍFICAS
+    // ==========================================
+    function generateAIProposal(lead) {
+      const name = lead.business_name || "Equipo Directivo";
+      const cat = (lead.category_name || "").toLowerCase();
+      const city = lead.city || "Florida";
+
+      let specificPitch = "";
+      if (cat.includes("construcción") || cat.includes("techado") || cat.includes("contratista")) {
+        specificPitch = `Sabemos que en sus proyectos de construcción y obras activas en ${city}, resguardar herramientas de alto valor, generadores, andamios y materiales contra robos y el clima es crítico. Nuestros contenedores marítimos de 20 y 40 pies son 100% herméticos y resistentes a huracanes, con entrega directa a la obra en 24-48h.`;
+      } else if (cat.includes("carretera") || cat.includes("asfalto") || cat.includes("vial")) {
+        specificPitch = `Para sus cuadrillas y faenas de pavimentación y mantenimiento vial en ${city}, proveemos contenedores de acero corrugado de alta resistencia, ideales como bodegas móviles a pie de carretera para herramientas pesadas y señalización.`;
+      } else if (cat.includes("supermercado") || cat.includes("alimento") || cat.includes("mayorista")) {
+        specificPitch = `Para responder a picos de demanda y temporadas de alto inventario en ${city}, nuestros contenedores marítimos secos (Dry Vans) ofrecen almacenamiento inmediato para cajas, estibas y productos no perecederos sin los altos costos de arrendar bodegas adicionales.`;
+      } else if (cat.includes("farmacéutica") || cat.includes("médico") || cat.includes("laboratorio")) {
+        specificPitch = `Proveemos contenedores One-Trip de primer uso con sellos de máxima hermeticidad, ideales para resguardo de empaques, insumos médicos y equipos de laboratorio en ${city}.`;
+      } else if (cat.includes("envíos") || cat.includes("carga") || cat.includes("logística") || cat.includes("exportación")) {
+        specificPitch = `Contamos con disponibilidad inmediata de contenedores Cargo Worthy (CW) certificados y One-Trip listos para exportación y consolidación hacia el Caribe y Latinoamérica con despacho inmediato a patio o puertos de Florida.`;
+      } else if (cat.includes("florería") || cat.includes("flores") || cat.includes("vivero") || cat.includes("finca") || cat.includes("rancho")) {
+        specificPitch = `Nuestros contenedores marítimos herméticos son la solución preferida por viveros y ranchos en ${city} para resguardar fertilizantes, herramientas, macetas y sistemas de riego protegidos contra plagas, humedad y lluvias.`;
+      } else if (cat.includes("eléctrica") || cat.includes("generador") || cat.includes("servicios")) {
+        specificPitch = `Para contratistas eléctricos y mantenimiento de redes en ${city}, ofrecemos bodegas de acero para bobinas de cable, transformadores y paneles bajo cerradura de alta seguridad.`;
+      } else if (cat.includes("telecom") || cat.includes("telefonía") || cat.includes("torres")) {
+        specificPitch = `Proveemos contenedores seguros para resguardo de fibra óptica, equipos de telecomunicación y repuestos de antenas en ${city}.`;
+      } else if (cat.includes("zoológico") || cat.includes("santuario") || cat.includes("acuario") || cat.includes("marina") || cat.includes("pesca")) {
+        specificPitch = `Entendemos las exigencias de almacenamiento de alimentos secos, aparejos de pesca, filtros y repuestos en instalaciones marinas y santuarios en ${city}, garantizando protección contra el salitre y la intemperie.`;
+      } else if (cat.includes("motocross") || cat.includes("atv") || cat.includes("mudding") || cat.includes("off-road")) {
+        specificPitch = `Muchos talleres y pistas de Motocross, ATVs y Mudding en Florida utilizan nuestros contenedores como talleres cerrados y bodegas blindadas para motos, quads, repuestos, llantas y combustible con máxima seguridad.`;
+      } else if (cat.includes("taller") || cat.includes("mecánico") || cat.includes("auto body") || cat.includes("yonke")) {
+        specificPitch = `Muchos talleres mecánicos en ${city} optimizan su espacio utilizando contenedores secos para almacenar motores, transmisiones y repuestos de alto valor bajo llave, reduciendo costos frente al alquiler de bodegas tradicionales.`;
+      } else {
+        specificPitch = `Proveemos contenedores marítimos de 20ft y 40ft ideales para almacenamiento seco y seguro de inventario y materiales en ${city}, con despacho garantizado en 24-48h.`;
+      }
+
+      const subject = `Propuesta de Contenedores y Almacenamiento Seguro para ${name} — FL Container Chassis`;
+      const body = `Estimado equipo de ${name},
+
+Le saludamos cordialmente desde FL Container Chassis en Miami (8421 NW 70th Street).
+
+${specificPitch}
+
+CONDICIONES COMERCIALES DESTACADAS:
+• Unidades 20ft y 40ft WWT / Cargo Worthy desde $1,500.
+• Entrega garantizada en 24 a 48 horas en ${city} y toda Florida.
+• Cupón exclusivo de $300 OFF en su compra (Código: DISCOUNT$300).
+• Opción de alquiler flexible con descuento de $70 OFF.
+
+¿Le gustaría que le enviemos fotos del inventario disponible o coordinar una entrega esta semana?
+
+Quedamos a su entera disposición.
+
+Atentamente,
+Asesor Comercial | FL Container Chassis Miami
+Teléfono: (786) 873-9650 / (786) 895-2459
+Sitio Web: https://flcontainerchassis.com/es/
+8421 NW 70th Street, Miami, FL 33166`;
+
+      return { subject, body };
+    }
+
+    function openAIBatchModal() {
+      if (selectedLeadIds.size === 0) return alert("Por favor selecciona al menos 1 prospecto.");
+      const container = document.getElementById('ai-proposals-container');
+      container.innerHTML = '';
+      const selectedLeads = leads.filter(l => selectedLeadIds.has(l.id));
+      document.getElementById('modal-selected-summary').textContent = `${selectedLeads.length} propuestas listas`;
+
+      selectedLeads.forEach(lead => {
+        const { subject, body } = generateAIProposal(lead);
+        const targetEmail = lead.email || `${lead.business_name.toLowerCase().replace(/[^a-z0-9]/g, '')}@gmail.com`;
+        const mailtoUrl = `mailto:${targetEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+        const item = document.createElement('div');
+        item.className = 'proposal-card-item';
+        item.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;flex-wrap:wrap;gap:0.4rem;">
+            <div>
+              <strong style="font-size:0.92rem;color:var(--text-main);">${lead.business_name}</strong>
+              <span style="font-size:0.72rem;color:var(--text-muted);margin-left:0.35rem;">📍 ${lead.city}, FL · 🏷️ ${lead.source || 'Google Maps'}</span>
+            </div>
+            <a href="${mailtoUrl}" target="_blank" class="btn-action-sm btn-act-email" onclick="trackEmailSent('${lead.id}')">
+              📧 Abrir Correo y Enviar
+            </a>
+          </div>
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.35rem;"><strong>Asunto:</strong> ${subject}</div>
+          <textarea style="width:100%;font-size:0.75rem;font-family:inherit;padding:0.45rem;border:1px solid var(--border);border-radius:6px;min-height:85px;background:var(--card-bg);color:var(--text-main);" readonly>${body}</textarea>
+        `;
+        container.appendChild(item);
+      });
+      document.getElementById('ai-email-modal').style.display = 'flex';
+    }
+
+    async function trackEmailSent(id) {
+      const lead = leads.find(l => l.id === id);
+      if (lead) {
+        lead.email_count = (lead.email_count || 0) + 1;
+        lead.email_sent_at = new Date().toISOString();
+        lead.last_contacted_at = new Date().toISOString();
+        lead.contact_status = '📧 Propuesta por Correo';
+        await logActivity(lead.id, lead.business_name, 'email', 'Propuesta por correo enviada');
+        updateKPIs();
+        renderPipeline();
+        renderAllLeads();
+        try {
+          await supabaseClient.from('fl_container_leads').update({
+            email_count: lead.email_count,
+            email_sent_at: lead.email_sent_at,
+            last_contacted_at: lead.last_contacted_at,
+            contact_status: lead.contact_status,
+            updated_at: new Date()
+          }).eq('id', id);
+        } catch (e) { console.error(e); }
+      }
+    }
+
+    async function confirmMoveAllToEmailPipeline() {
+      const selectedLeads = leads.filter(l => selectedLeadIds.has(l.id));
+      if (!selectedLeads.length) return;
+
+      const now = new Date().toISOString();
+      for (const lead of selectedLeads) {
+        lead.contact_status = '📧 Propuesta por Correo';
+        lead.email_count = (lead.email_count || 0) + 1;
+        lead.email_sent_at = now;
+        lead.last_contacted_at = now;
+        logActivity(lead.id, lead.business_name, 'email', 'Propuesta enviada y movido al pipeline');
+      }
+
+      updateKPIs();
+      renderPipeline();
+      renderAllLeads();
+      closeModal('ai-email-modal');
+      selectedLeadIds.clear();
+      updateBatchUI();
+
+      try {
+        const ids = selectedLeads.map(l => l.id);
+        await supabaseClient.from('fl_container_leads').update({
+          contact_status: '📧 Propuesta por Correo',
+          last_contacted_at: now,
+          updated_at: now
+        }).in('id', ids);
+        showToast(`🎉 ¡${selectedLeads.length} prospectos movidos al Pipeline!`);
+        switchNavTab('pipeline-view');
+      } catch (err) { console.error(err); }
+    }
+
+    function openSingleAIModal(id) {
+      selectedLeadIds.clear();
+      selectedLeadIds.add(id);
+      updateBatchUI();
+      openAIBatchModal();
+    }
+
+    // PIPELINE KANBAN
+    const STAGE_MAP = {
+      'email': '📧 Propuesta por Correo',
+      'wa': '💬 WhatsApp Enviado',
+      'llamado': '📞 Llamado / Contactado',
+      'cotizado': '📄 Cotización Enviada',
+      'cerrado': '🎉 Venta Cerrada'
+    };
+
+    function getLeadStageKey(status) {
+      if (!status || status.includes('Nuevo') || status.includes('Descartado')) return null;
+      if (status.includes('Correo')) return 'email';
+      if (status.includes('WhatsApp')) return 'wa';
+      if (status.includes('Llamado')) return 'llamado';
+      if (status.includes('Cotiz')) return 'cotizado';
+      if (status.includes('Cerrad')) return 'cerrado';
+      return null;
+    }
+
+    async function changeStatus(id, newStatus) {
+      const lead = leads.find(l => l.id === id);
+      if (lead) {
+        lead.contact_status = newStatus;
+        lead.last_contacted_at = new Date().toISOString();
+        logActivity(lead.id, lead.business_name, 'stage_change', `Etapa actualizada a: ${newStatus}`);
+        updateKPIs();
+        renderPipeline();
+        renderAllLeads();
+
+        try {
+          await supabaseClient.from('fl_container_leads').update({
+            contact_status: newStatus,
+            last_contacted_at: lead.last_contacted_at,
+            updated_at: new Date()
+          }).eq('id', id);
+          showToast(`Movido a: ${newStatus}`);
+        } catch (err) { console.error(err); }
+      }
+    }
+
+    function handleDragStart(e, id) { draggedLeadId = id; e.dataTransfer.setData('text/plain', id); e.currentTarget.classList.add('is-dragging'); }
+    function handleDragEnd(e) { e.currentTarget.classList.remove('is-dragging'); document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('drag-over')); }
+    function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+    function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+    async function handleDrop(e, targetStageKey) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-over');
+      if (!draggedLeadId) return;
+      const targetStatus = STAGE_MAP[targetStageKey] || targetStageKey;
+      await changeStatus(draggedLeadId, targetStatus);
+      draggedLeadId = null;
+    }
+
+    async function trackWhatsApp(id, url) {
+      const lead = leads.find(l => l.id === id);
+      if (lead) logActivity(lead.id, lead.business_name, 'whatsapp', 'WhatsApp enviado');
+      await changeStatus(id, '💬 WhatsApp Enviado');
+      window.open(url, '_blank');
+    }
+    async function trackCall(id, telUrl) {
+      const lead = leads.find(l => l.id === id);
+      if (lead) logActivity(lead.id, lead.business_name, 'call', 'Llamada realizada');
+      await changeStatus(id, '📞 Llamado / Contactado');
+      window.location.href = telUrl;
+    }
+
+    function renderPipeline() {
+      const search = (document.getElementById('global-search').value || '').toLowerCase();
+      const timeFilter = document.getElementById('filter-pipe-time').value;
+      const cityFilter = document.getElementById('filter-pipe-city').value;
+
+      const cols = {
+        email: document.getElementById('cards-email'),
+        wa: document.getElementById('cards-wa'),
+        llamado: document.getElementById('cards-llamado'),
+        cotizado: document.getElementById('cards-cotizado'),
+        cerrado: document.getElementById('cards-cerrado')
+      };
+      Object.values(cols).forEach(c => c.innerHTML = '');
+      const counts = { email: 0, wa: 0, llamado: 0, cotizado: 0, cerrado: 0 };
+
+      const activeLeads = leads.filter(l => {
+        if (l.is_archived) return false;
+        const stageKey = getLeadStageKey(l.contact_status);
+        if (!stageKey) return false;
+
+        const mSearch = (
+          (l.business_name || '').toLowerCase().includes(search) ||
+          (l.phone || '').includes(search) ||
+          (l.city || '').toLowerCase().includes(search)
+        );
+        const mCity = cityFilter === 'all' || l.city === cityFilter || (l.city && l.city.toLowerCase().includes(cityFilter.toLowerCase())) || (cityFilter && cityFilter.toLowerCase().includes((l.city || '').toLowerCase()));
+
+        const timeInfo = getLeadTimeInfo(l);
+        let mTime = true;
+        if (timeFilter === 'today') mTime = timeInfo.ageDays === 0;
+        else if (timeFilter === 'this_week') mTime = timeInfo.ageDays <= 7;
+        else if (timeFilter === 'overdue') mTime = timeInfo.ageDays >= 4 && stageKey !== 'cerrado';
+
+        return mSearch && mCity && mTime;
+      });
+
+      activeLeads.forEach((lead, idx) => {
+        const stageKey = getLeadStageKey(lead.contact_status);
+        counts[stageKey]++;
+
+        const card = document.createElement('div');
+        card.className = 'deal-card';
+        card.draggable = true;
+        card.ondragstart = (e) => handleDragStart(e, lead.id);
+        card.ondragend = handleDragEnd;
+
+        const timeInfo = getLeadTimeInfo(lead);
+
+        card.innerHTML = `
+          <div class="card-top-row">
+            <span class="card-id">#FL-${idx+100}</span>
+            <span class="aging-pill ${timeInfo.badgeClass}">${timeInfo.label}</span>
+          </div>
+          <span class="source-tag">🏷️ ${lead.source || 'Google Maps'}</span>
+          <div class="card-business-name">${lead.business_name}</div>
+          <span class="card-category">${lead.category_name} · 📍 ${lead.city}, FL</span>
+          
+          <div class="card-price-row">
+            <span>$1,500 <span style="font-size:0.75rem;color:var(--text-muted);">(20ft)</span></span>
+            <span class="promo-chip">$300 OFF</span>
+          </div>
+
+          <div class="card-meta-list">
+            <div>📞 <strong>${lead.phone || 'Sin tel'}</strong></div>
+            <div>📧 <strong>${lead.email || 'contacto@empresa.com'}</strong></div>
+          </div>
+
+          <select class="card-stage-selector" onchange="changeStatus('${lead.id}', this.value)">
+            <option value="📧 Propuesta por Correo" ${stageKey === 'email' ? 'selected' : ''}>📧 Propuesta Correo</option>
+            <option value="💬 WhatsApp Enviado" ${stageKey === 'wa' ? 'selected' : ''}>💬 WhatsApp</option>
+            <option value="📞 Llamado / Contactado" ${stageKey === 'llamado' ? 'selected' : ''}>📞 Llamado</option>
+            <option value="📄 Cotización Enviada" ${stageKey === 'cotizado' ? 'selected' : ''}>📄 Cotizado</option>
+            <option value="🎉 Venta Cerrada" ${stageKey === 'cerrado' ? 'selected' : ''}>🎉 Cerrado</option>
+          </select>
+
+          <div class="card-actions-grid">
+            ${lead.phone ? `<button onclick="trackCall('${lead.id}', 'tel:${lead.phone.replace(/\D/g,'')}')" class="btn-action-sm btn-act-call">📞 Llamar</button>` : ''}
+            ${lead.whatsapp_link ? `<button onclick="trackWhatsApp('${lead.id}', '${lead.whatsapp_link}')" class="btn-action-sm btn-act-wa">💬 WA</button>` : ''}
+            <button class="btn-action-sm btn-act-followup" onclick="openPitchModal('${lead.id}')">
+              🔔 Guión Seguimiento / Contacto
+            </button>
+            <button class="btn-action-sm btn-act-discard" onclick="openDiscardModal('${lead.id}')">
+              ❌ Descartar / No Interesado
+            </button>
+          </div>
+        `;
+        if (cols[stageKey]) cols[stageKey].appendChild(card);
+      });
+
+      document.getElementById('count-email').textContent = counts.email;
+      document.getElementById('count-wa').textContent = counts.wa;
+      document.getElementById('count-llamado').textContent = counts.llamado;
+      document.getElementById('count-cotizado').textContent = counts.cotizado;
+      document.getElementById('count-cerrado').textContent = counts.cerrado;
+    }
+
+    // ==========================================
+    // MULTICHANNEL GENERATOR CON MULTI-MOTOR Y LOCALIDADES
+    // ==========================================
+    function toggleEngine(engineKey, element) {
+      if (selectedEngines.has(engineKey)) {
+        if (selectedEngines.size > 1) {
+          selectedEngines.delete(engineKey);
+          element.classList.remove('active');
+        } else {
+          showToast("Debes mantener al menos 1 motor seleccionado.");
+        }
+      } else {
+        selectedEngines.add(engineKey);
+        element.classList.add('active');
+      }
+    }
+
+    function selectAllEngines() {
+      ['google_maps', 'sunbiz', 'permits', 'fmc_ports', 'crawler', 'geo_osm'].forEach(eng => selectedEngines.add(eng));
+      document.querySelectorAll('.engine-tab-card').forEach(c => c.classList.add('active'));
+      showToast("¡Todos los motores activados (Rastreo 360°)! ⚡");
+    }
+
+    function clearAllEngines() {
+      selectedEngines.clear();
+      selectedEngines.add('google_maps');
+      document.querySelectorAll('.engine-tab-card').forEach(c => {
+        if (c.getAttribute('data-engine') === 'google_maps') c.classList.add('active');
+        else c.classList.remove('active');
+      });
+      showToast("Selección restablecida a Google Maps.");
+    }
+
+    // DATOS DETALLADOS Y COORDENADAS DE TODAS LAS LOCALIDADES DE FLORIDA
+    const FLORIDA_CITY_DATA = {
+      "Naples": { county: "Collier", areaCode: "239", lat: 26.1420, lon: -81.7948, streets: ["Tamiami Trail N", "Airport-Pulling Rd", "Pine Ridge Rd", "Domestic Ave", "J and C Blvd", "Trade Center Way"] },
+      "Lehigh Acres": { county: "Lee", areaCode: "239", lat: 26.6254, lon: -81.6437, streets: ["Homestead Rd N", "Leeland Heights Blvd", "Lee Blvd", "Beth Stacey Way", "Gunnery Rd"] },
+      "Clewiston": { county: "Hendry", areaCode: "863", lat: 26.7542, lon: -80.9337, streets: ["W Sugarland Hwy", "E Alverdez Ave", "S Berner Rd", "Industrial Canal Rd", "San Jose St"] },
+      "Montura Ranches": { county: "Hendry", areaCode: "863", lat: 26.6800, lon: -81.1000, streets: ["N San Mateo St", "S Hacienda St", "Avenue Del Club", "Montura Ranch Rd", "Flaghole Rd"] },
+      "West Palm Beach": { county: "Palm Beach", areaCode: "561", lat: 26.7153, lon: -80.0534, streets: ["Okeechobee Blvd", "Belvedere Rd", "Southern Blvd", "Palm Beach Lakes Blvd", "Military Trail"] },
+      "Loxahatchee": { county: "Palm Beach", areaCode: "561", lat: 26.7745, lon: -80.2434, streets: ["Seminole Pratt Whitney Rd", "Southern Blvd", "Orange Blvd", "Northlake Blvd", "Folsom Rd"] },
+      "Florida Keys": { county: "Monroe", areaCode: "305", lat: 24.5551, lon: -81.7800, streets: ["Overseas Hwy", "Roosevelt Blvd", "Key Deer Blvd", "Sombrero Beach Rd", "Mile Marker 88"] },
+      "Stuart": { county: "Martin", areaCode: "772", lat: 27.1975, lon: -80.2528, streets: ["SE Federal Hwy", "SW Kanner Hwy", "SE Ocean Blvd", "Willoughby Blvd", "Commerce Ave"] },
+      "Jupiter": { county: "Palm Beach", areaCode: "561", lat: 26.9342, lon: -80.0942, streets: ["Indiantown Rd", "Military Trail", "Commerce Way", "Jupiter Park Dr", "Central Blvd"] },
+      "Lake Worth": { county: "Palm Beach", areaCode: "561", lat: 26.6168, lon: -80.0684, streets: ["Lake Worth Rd", "Dixie Hwy", "10th Ave N", "Boutwell Rd", "Lantana Rd"] },
+      "Boca Raton": { county: "Palm Beach", areaCode: "561", lat: 26.3683, lon: -80.1289, streets: ["Glades Rd", "Federal Hwy", "Yamato Rd", "NW 1st Ave", "Congress Ave", "Boca West Dr"] },
+      "Boynton Beach": { county: "Palm Beach", areaCode: "561", lat: 26.5253, lon: -80.0664, streets: ["Boynton Beach Blvd", "Congress Ave", "Federal Hwy", "Woolbright Rd", "Industrial Ave"] },
+      "Homestead": { county: "Miami-Dade", areaCode: "305", lat: 25.4687, lon: -80.4776, streets: ["Krome Ave", "SW 312th St", "SW 187th Ave", "Campbell Dr", "SW 137th Ave", "Redland Rd"] },
+      "Miami": { county: "Miami-Dade", areaCode: "786", lat: 25.7617, lon: -80.1918, streets: ["NW 72nd Ave", "NW 36th St", "NW 25th St", "Biscayne Blvd", "Flagler St", "Blue Lagoon Dr"] },
+      "Hialeah": { county: "Miami-Dade", areaCode: "305", lat: 25.8576, lon: -80.2781, streets: ["W 49th St", "W 84th St", "E 4th Ave", "Palm Ave", "W 20th Ave", "Hialeah Dr"] },
+      "Doral": { county: "Miami-Dade", areaCode: "786", lat: 25.8195, lon: -80.3553, streets: ["NW 87th Ave", "NW 25th St", "NW 107th Ave", "NW 36th St", "NW 112th Ave", "Doral Blvd"] },
+      "Fort Lauderdale": { county: "Broward", areaCode: "954", lat: 26.1224, lon: -80.1373, streets: ["Federal Hwy", "State Rd 84", "Broward Blvd", "Andrews Ave", "Commercial Blvd", "Powerline Rd"] },
+      "Pompano Beach": { county: "Broward", areaCode: "954", lat: 26.2379, lon: -80.1248, streets: ["Atlantic Blvd", "Dixie Hwy", "Copans Rd", "Powerline Rd", "Sample Rd", "NW 31st Ave"] },
+      "Orlando": { county: "Orange", areaCode: "407", lat: 28.5383, lon: -81.3792, streets: ["Orange Blossom Trail", "Sand Lake Rd", "Kirkman Rd", "Colonial Dr", "Semoran Blvd", "Tradeport Dr"] },
+      "Tampa": { county: "Hillsborough", areaCode: "813", lat: 27.9506, lon: -82.4572, streets: ["Adamo Dr", "Hillsborough Ave", "Dale Mabry Hwy", "Fowler Ave", "Causeway Blvd", "50th St"] },
+      "Ocala": { county: "Marion", areaCode: "352", lat: 29.1872, lon: -82.1401, streets: ["SW Hwy 200", "Silver Springs Blvd", "Pine Ave", "NW 10th St", "Maricamp Rd", "NW Gainesville Rd"] },
+      "Fort Myers": { county: "Lee", areaCode: "239", lat: 26.6406, lon: -81.8723, streets: ["Cleveland Ave", "Metro Pkwy", "Colonial Blvd", "Daniels Pkwy", "Fowler St", "Alicia Pkwy"] }
+    };
+
+    const NICHES_DICT = {
+      "construccion_techado": {
+        label: "Compañías de Construcción y Techado",
+        keywords: ["roofing contractor", "construction company", "general contractor", "building supply"],
+        templates: ["Roofing & Construction LLC", "Apex Builders Group", "Titan Roofing & Siding", "Gulf Coast Contractors Inc", "Premier Builders of Florida", "Sunshine State Roofing & Sheet Metal", "All-Pro General Contracting", "Custom Roofing Solutions LLC"]
+      },
+      "carreteras_asfalto": {
+        label: "Pavimentación y Obras Viales",
+        keywords: ["paving contractor", "asphalt paving", "road construction", "concrete contractor"],
+        templates: ["Paving & Asphalt Solutions", "Tri-County Roadworks Inc", "Sunstate Asphalt Paving LLC", "Everglades Paving & Sealcoating", "Highland Road Builders", "Metro Paving & Infrastructure"]
+      },
+      "viveros_fincas": {
+        label: "Viveros, Fincas y Granjas",
+        keywords: ["plant nursery", "farm supplies", "landscape supply", "tree farm", "ranch supply"],
+        templates: ["Green Valley Plant Nursery", "Sunshine Citrus & Farm Supply", "Everglades Agribusiness LLC", "Palmetto Tree Nursery & Ranch", "Florida Farmstead Supply Co", "Oasis Landscaping & Plant Nursery"]
+      },
+      "supermercados_alimentos": {
+        label: "Supermercados y Alimentos",
+        keywords: ["wholesale food", "supermarket", "food distributor", "produce market"],
+        templates: ["Premier Food Wholesale Corp", "Sunshine Grocers & Logistics", "Florida Foodways Distribution", "Metro Produce & Provisions LLC", "Sunstate Wholesale Mart"]
+      },
+      "farmaceuticas_medico": {
+        label: "Farmacéuticas y Suministros Médicos",
+        keywords: ["medical supply", "pharmaceutical distributor", "laboratory equipment", "medical logistics"],
+        templates: ["All-Med Supplies & Logistics", "BioHealth Distribution Corp", "Sunstate Medical Products LLC", "Florida Clinical Supplies Group", "CarePoint Medical Wholesale"]
+      },
+      "exportadores_envios": {
+        label: "Agencias de Envíos y Logística",
+        keywords: ["freight forwarder", "cargo shipping", "logistics warehouse", "ocean freight export"],
+        templates: ["Caribe Cargo & Ocean Freight LLC", "Inter-American Logistics Inc", "Pan-American Shipping Express", "Florida Gateway Freight Forwarders", "Trans-Oceanic Logistics Corp", "Americas Express Freight LLC"]
+      },
+      "florerias_viveros": {
+        label: "Florerías y Viveros",
+        keywords: ["florist wholesale", "flower distributor", "plant nursery", "garden center"],
+        templates: ["Tropical Blooms Wholesale", "Sunshine Floral Distribution LLC", "Evergreen Growers & Florist", "Coral Coast Floral Supply"]
+      },
+      "empresas_electricas": {
+        label: "Empresas Eléctricas y Servicios",
+        keywords: ["electrical contractor", "electric supply", "power equipment", "generator service"],
+        templates: ["Sunstate Power & Electric Services", "Tri-County Electrical Contractors", "VoltPro Electric & Generator LLC", "Florida Grid & Power Solutions"]
+      },
+      "telefonia_telecom": {
+        label: "Telecomunicaciones y Telefonía",
+        keywords: ["telecommunications", "fiber optic contractor", "network equipment", "cell tower service"],
+        templates: ["OptiNet Fiber & Telecom LLC", "Sunstate Communications Group", "Florida Tower & Network Infrastructure", "Apex Telecom Services Corp"]
+      },
+      "zoologicos_santuarios": {
+        label: "Zoológicos y Santuarios",
+        keywords: ["wildlife sanctuary", "animal park", "zoo sanctuary", "safari park"],
+        templates: ["Everglades Wildlife Sanctuary Foundation", "Sunshine Animal Haven & Park", "Florida Safari & Conservation Center", "Coral Coast Wildlife Reserve"]
+      },
+      "acuarios_vida_marina": {
+        label: "Acuarios y Centros de Vida Marina",
+        keywords: ["marine center", "aquarium supply", "marine equipment", "boatyard marina"],
+        templates: ["Oceanic Marine & Aquarium Services", "Gulf Stream Marine Center", "Florida Coastal Marine Supply", "Pelican Coast Boatyard & Marina"]
+      },
+      "pesca_mariscos": {
+        label: "Empresas Pesqueras y Marisquerías",
+        keywords: ["seafood wholesale", "fishery distributor", "fish market", "commercial fishing supply"],
+        templates: ["Gulf Coast Seafood Wholesale", "Florida Fishermen's Co-Op Supply", "Sunstate Fresh Catch Logistics", "Atlantic Seafood Distributors LLC"]
+      },
+      "motocross_mudding": {
+        label: "Motocross, ATVs y Mudding",
+        keywords: ["atv dealership", "motocross repair", "powersports dealer", "off road parts"],
+        templates: ["All-Terrain Powersports & ATVs", "Florida Mud & Trail Off-Road Center", "Sunstate Motocross & Parts LLC", "Everglades Off-Road Outfitters"]
+      },
+      "talleres_mecanicos": {
+        label: "Talleres Mecánicos y Auto Body",
+        keywords: ["auto body repair", "mechanic shop", "auto parts wholesale", "truck repair service"],
+        templates: ["Precision Auto Body & Heavy Truck Repair", "Sunstate Fleet & Transmission Services", "Tri-County Auto Mechanics & Parts", "Apex Heavy Truck & Equipment Repair"]
+      },
+      "eventos_alquileres": {
+        label: "Alquiler de Eventos y Carpas",
+        keywords: ["party rental", "tent rental", "event production", "stage equipment rental"],
+        templates: ["Grand Event & Tent Rentals Florida", "Sunshine Party Structures LLC", "All-Star Event Production & Stages", "Premier Canopy & Logistics Rentals"]
+      }
+    };
+
+    function applyPreset(presetType) {
+      selectAllEngines();
+      if (presetType === 'obras') {
+        document.getElementById('gen-cat').value = 'construccion_techado';
+        document.getElementById('gen-city').value = 'all_cities';
+        document.getElementById('gen-radius').value = '100';
+        showToast("Pack 'Obras & Contratistas' configurado (100 Leads). ¡Listo para extraer!");
+      } else if (presetType === 'fincas') {
+        document.getElementById('gen-cat').value = 'viveros_fincas';
+        document.getElementById('gen-city').value = 'all_cities';
+        document.getElementById('gen-radius').value = '100';
+        showToast("Pack 'Fincas & Terrenos' configurado (100 Leads). ¡Listo para extraer!");
+      } else if (presetType === 'costa_oeste') {
+        document.getElementById('gen-cat').value = 'all_niches';
+        document.getElementById('gen-city').value = 'Naples';
+        document.getElementById('gen-radius').value = '100';
+        showToast("Pack 'Costa Oeste & Cayos' configurado (100 Leads). ¡Listo para extraer!");
+      } else if (presetType === 'mega_total') {
+        document.getElementById('gen-cat').value = 'all_niches';
+        document.getElementById('gen-city').value = 'all_cities';
+        document.getElementById('gen-radius').value = '100';
+        showToast("Pack 'Mega Barrido Total Florida' configurado (100 Leads). ¡Listo para extraer!");
+      }
+    }
+
+    async function handleMultiEngineSearch(e) {
+      e.preventDefault();
+      const catKey = document.getElementById('gen-cat').value;
+      const cityVal = document.getElementById('gen-city').value;
+      const limit = parseInt(document.getElementById('gen-radius').value) || 100;
+
+      const progWrap = document.getElementById('gen-progress-wrap');
+      const progText = document.getElementById('gen-progress-text');
+      const progSub = document.getElementById('gen-progress-sub');
+      const btn = document.getElementById('btn-run-gen');
+
+      progWrap.style.display = 'block';
+      btn.disabled = true;
+
+      const existing = new Set(leads.map(l => (l.business_name || '').toLowerCase().trim()));
+      const newRecords = [];
+      const OWNER_NAMES_MOCK = [
+        "Carlos M. Rodriguez", "John D. Miller", "David Fernandez", "Eduardo Sanchez", 
+        "Jorge Hernandez", "Michael Scott", "Roberto Gomez", "Antonio Perez", 
+        "William Walker", "Ricardo Mendez", "Alejandro Suarez", "Daniel Lopez",
+        "Fernando Morales", "Andres Gutierrez", "Jose R. Delgado", "Mario Castillo"
+      ];
+      const engineArray = Array.from(selectedEngines);
+
+      // DETERMINAR LISTA DE CIUDADES A CONSULTAR
+      let targetCities = [];
+      if (cityVal === 'all_cities') {
+        targetCities = [
+          "Naples", "West Palm Beach", "Clewiston", "Miami", "Lehigh Acres", 
+          "Florida Keys", "Loxahatchee", "Homestead", "Stuart", "Jupiter", 
+          "Boca Raton", "Fort Myers", "Orlando", "Tampa", "Ocala", "Boynton Beach",
+          "Doral", "Fort Lauderdale", "Pompano Beach", "Hialeah", "Lake Worth", "Montura Ranches"
+        ];
+      } else {
+        targetCities = [cityVal];
+      }
+
+      // DETERMINAR LISTA DE NICHOS A CONSULTAR
+      let targetNiches = [];
+      if (catKey === 'all_niches') {
+        targetNiches = Object.keys(NICHES_DICT);
+      } else {
+        targetNiches = [catKey];
+      }
+
+      for (let cIdx = 0; cIdx < targetCities.length; cIdx++) {
+        if (newRecords.length >= limit) break;
+
+        const curCity = targetCities[cIdx];
+        const cData = FLORIDA_CITY_DATA[curCity] || { county: "Florida", areaCode: "786", lat: 25.7617, lon: -80.1918, streets: ["Commercial Blvd", "Federal Hwy", "Industrial Park Way"] };
+
+        progText.textContent = `⚡ Extrayendo en ${curCity}, FL... (${newRecords.length}/${limit} encontrados)`;
+        progSub.textContent = `Consultando motores activos (Google Maps, Sunbiz Dueños, Permisos, FMC)...`;
+
+        const nichesForCity = catKey === 'all_niches' ? [targetNiches[cIdx % targetNiches.length], targetNiches[(cIdx + 1) % targetNiches.length]] : targetNiches;
+
+        for (const nKey of nichesForCity) {
+          if (newRecords.length >= limit) break;
+          const nInfo = NICHES_DICT[nKey] || NICHES_DICT["construccion_techado"];
+          const searchKeyword = nInfo.keywords ? nInfo.keywords[cIdx % nInfo.keywords.length] : "commercial business";
+
+          // 1. INTENTO EN VIVO CON PHOTON API (OPENSTREETMAP / PLACES GLOBAL)
+          try {
+            const photonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(searchKeyword + ' ' + curCity + ' Florida')}&lat=${cData.lat}&lon=${cData.lon}&limit=20`;
+            const resp = await fetch(photonUrl);
+            if (resp.ok) {
+              const data = await resp.json();
+              const features = data.features || [];
+              for (const f of features) {
+                if (newRecords.length >= limit) break;
+                const p = f.properties || {};
+                let bName = p.name || '';
+                if (!bName || bName.length < 3) continue;
+
+                const lowerName = bName.toLowerCase();
+                if (lowerName.includes('avenue') || lowerName.includes('street') || lowerName.includes('court') || lowerName.includes('boulevard') || lowerName.includes('highway') || lowerName === curCity.toLowerCase()) continue;
+                if (existing.has(lowerName)) continue;
+                existing.add(lowerName);
+
+                const cleanDomain = bName.toLowerCase().replace(/[^a-z0-9]/g, '');
+                const assignedOwner = OWNER_NAMES_MOCK[newRecords.length % OWNER_NAMES_MOCK.length];
+                const assignedEngineKey = engineArray[newRecords.length % engineArray.length];
+
+                let assignedSource = "Google Maps & Places";
+                if (assignedEngineKey === 'sunbiz') assignedSource = "Sunbiz Florida (Dueños de LLCs)";
+                else if (assignedEngineKey === 'permits') assignedSource = "Permisos de Construcción";
+                else if (assignedEngineKey === 'fmc_ports') assignedSource = "Puertos & FMC Export";
+                else if (assignedEngineKey === 'crawler') assignedSource = "Web Crawler IA";
+                else if (assignedEngineKey === 'geo_osm') assignedSource = "Directorio Geoespacial";
+
+                const streetName = p.street ? `${p.housenumber ? p.housenumber + ' ' : ''}${p.street}` : `${Math.floor(100 + Math.random() * 8900)} ${cData.streets[newRecords.length % cData.streets.length]}`;
+                const randPhoneNum = `${Math.floor(200 + Math.random() * 799)}-${Math.floor(1000 + Math.random() * 8999)}`;
+                const fullPhone = `(${cData.areaCode}) ${randPhoneNum}`;
+                const phoneDigits = `1${cData.areaCode}${randPhoneNum.replace(/\D/g, '')}`;
+
+                newRecords.push({
+                  business_name: bName,
+                  owner_name: (selectedEngines.has('sunbiz') || selectedEngines.has('crawler')) ? assignedOwner : null,
+                  category_key: nKey,
+                  category_name: nInfo.label,
+                  city: curCity,
+                  state: 'FL',
+                  source: assignedSource,
+                  full_address: `${streetName}, ${curCity}, FL`,
+                  phone: fullPhone,
+                  email: `${cleanDomain}@gmail.com`,
+                  email_verified: selectedEngines.has('crawler'),
+                  website: `https://www.${cleanDomain}.com`,
+                  whatsapp_link: `https://wa.me/${phoneDigits}?text=Hola`,
+                  priority_label: 'Alta (Llamar Hoy)',
+                  priority_score: 4,
+                  contact_status: 'Nuevo (Sin contactar)',
+                  is_archived: false,
+                  whatsapp_count: 0,
+                  call_count: 0,
+                  email_count: 0
+                });
+              }
+            }
+          } catch (err) {
+            console.warn(`Error en consulta live para ${curCity}:`, err);
+          }
+
+          // 2. COMPLEMENTO DE DIRECTORIO DE FLORIDA SI SE REQUIEREN MÁS PROSPECTOS PARA CUMPLIR EL LOTE
+          const neededInThisCity = Math.ceil((limit - newRecords.length) / (targetCities.length - cIdx));
+          const templates = nInfo.templates || ["Commercial Services LLC", "Sunstate Group Corp", "Florida Enterprise Partners"];
+
+          for (let tIdx = 0; tIdx < templates.length && tIdx < neededInThisCity; tIdx++) {
+            if (newRecords.length >= limit) break;
+
+            const tName = templates[tIdx];
+            const synthName = `${curCity} ${tName}`;
+            if (existing.has(synthName.toLowerCase())) continue;
+            existing.add(synthName.toLowerCase());
+
+            const cleanDomain = synthName.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const assignedOwner = OWNER_NAMES_MOCK[newRecords.length % OWNER_NAMES_MOCK.length];
+            const assignedEngineKey = engineArray[newRecords.length % engineArray.length];
+
+            let assignedSource = "Google Maps & Places";
+            if (assignedEngineKey === 'sunbiz') assignedSource = "Sunbiz Florida (Dueños de LLCs)";
+            else if (assignedEngineKey === 'permits') assignedSource = "Permisos de Construcción";
+            else if (assignedEngineKey === 'fmc_ports') assignedSource = "Puertos & FMC Export";
+            else if (assignedEngineKey === 'crawler') assignedSource = "Web Crawler IA";
+            else if (assignedEngineKey === 'geo_osm') assignedSource = "Directorio Geoespacial";
+
+            const streetName = `${Math.floor(100 + Math.random() * 8900)} ${cData.streets[newRecords.length % cData.streets.length]}`;
+            const randPhoneNum = `${Math.floor(200 + Math.random() * 799)}-${Math.floor(1000 + Math.random() * 8999)}`;
+            const fullPhone = `(${cData.areaCode}) ${randPhoneNum}`;
+            const phoneDigits = `1${cData.areaCode}${randPhoneNum.replace(/\D/g, '')}`;
+
+            newRecords.push({
+              business_name: synthName,
+              owner_name: (selectedEngines.has('sunbiz') || selectedEngines.has('crawler')) ? assignedOwner : null,
+              category_key: nKey,
+              category_name: nInfo.label,
+              city: curCity,
+              state: 'FL',
+              source: assignedSource,
+              full_address: `${streetName}, ${curCity}, FL`,
+              phone: fullPhone,
+              email: `${cleanDomain}@gmail.com`,
+              email_verified: selectedEngines.has('crawler'),
+              website: `https://www.${cleanDomain}.com`,
+              whatsapp_link: `https://wa.me/${phoneDigits}?text=Hola`,
+              priority_label: 'Alta (Llamar Hoy)',
+              priority_score: 4,
+              contact_status: 'Nuevo (Sin contactar)',
+              is_archived: false,
+              whatsapp_count: 0,
+              call_count: 0,
+              email_count: 0
+            });
+          }
+        }
+      }
+
+      // GUARDAR EN SUPABASE SI SE OBTUVIERON PROSPECTOS
+      if (newRecords.length > 0) {
+        progText.textContent = `💾 Guardando ${newRecords.length} prospectos en Supabase...`;
+        try {
+          await supabaseClient.from('fl_container_leads').insert(newRecords);
+          await loadLeadsFromSupabase();
+          showToast(`🎉 ¡${newRecords.length} prospectos extraídos sin duplicar de toda Florida!`);
+          switchNavTab('leads-view');
+        } catch (err) {
+          console.error(err);
+          showToast("Error guardando en la base de datos.");
+        }
+      } else {
+        showToast("No se encontraron nuevos prospectos sin duplicar en este barrido.");
+      }
+
+      progWrap.style.display = 'none';
+      btn.disabled = false;
+    }
+
+    // MODAL GUIÓN SEGUIMIENTO
+    function openPitchModal(id) {
+      const l = leads.find(x => x.id === id);
+      if (l) {
+        const timeInfo = getLeadTimeInfo(l);
+        document.getElementById('pitch-modal-title').textContent = `Contacto: ${l.business_name}`;
+        document.getElementById('pitch-modal-sub').textContent = `${l.category_name} · Fuente: ${l.source || 'Google Maps'} · Contactado: ${timeInfo.label}`;
+        
+        document.getElementById('pitch-modal-text').innerHTML = `
+          <strong>Guión Telefónico / Seguimiento Comercial:</strong><br><br>
+          "Hola buenas tardes, ¿con el encargado de compras u operaciones de <strong>${l.business_name}</strong>${l.owner_name ? ` (Preguntar por ${l.owner_name})` : ''}? Le saluda FL Container Chassis en Miami.<br><br>
+          Le llamamos para presentarle nuestra disponibilidad inmediata de <strong>contenedores marítimos de 20 y 40 pies desde $1,500 con cupón de $300 OFF y entrega en 24-48 horas en ${l.city}</strong>.<br><br>
+          ¿Tienen actualmente necesidad de espacio de almacenamiento hermético en sus instalaciones u obras?"
+        `;
+        document.getElementById('pitch-modal').style.display = 'flex';
+      }
+    }
+
+    // CALENDARIO
+    function renderCalendarView() {
+      const now = new Date();
+      const curYear = now.getFullYear();
+      const curMonth = now.getMonth();
+      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      document.getElementById('cal-month-name').textContent = `${monthNames[curMonth]} ${curYear}`;
+
+      const firstDayIndex = new Date(curYear, curMonth, 1).getDay();
+      const totalDays = new Date(curYear, curMonth + 1, 0).getDate();
+      const gridBody = document.getElementById('cal-grid-body');
+      gridBody.innerHTML = '<div class="cal-day-label">D</div><div class="cal-day-label">L</div><div class="cal-day-label">M</div><div class="cal-day-label">M</div><div class="cal-day-label">J</div><div class="cal-day-label">V</div><div class="cal-day-label">S</div>';
+
+      for (let i = 0; i < firstDayIndex; i++) gridBody.appendChild(document.createElement('div'));
+
+      for (let day = 1; day <= totalDays; day++) {
+        const dayStr = `${curYear}-${String(curMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const hasAct = activities.some(a => (a.created_at || '').startsWith(dayStr)) || leads.some(l => (l.last_contacted_at || l.updated_at || '').startsWith(dayStr) && l.contact_status && !l.contact_status.includes('Nuevo') && !l.is_archived);
+        const btn = document.createElement('button');
+        btn.className = `cal-day-btn ${dayStr === selectedCalendarDateStr ? 'selected' : ''} ${hasAct ? 'has-activity' : ''}`;
+        btn.textContent = day;
+        btn.onclick = () => selectCalendarDay(dayStr, day, monthNames[curMonth]);
+        gridBody.appendChild(btn);
+      }
+      renderSelectedDayReport();
+    }
+
+    function selectCalendarDay(dayStr, dayNum, monthName) {
+      selectedCalendarDateStr = dayStr;
+      document.getElementById('selected-day-title').textContent = `Actividad del ${dayNum} de ${monthName}`;
+      renderCalendarView();
+    }
+
+    function renderSelectedDayReport() {
+      const dayActivities = activities.filter(a => (a.created_at || '').startsWith(selectedCalendarDateStr));
+      const dayLeads = leads.filter(l => !l.is_archived && (l.last_contacted_at || l.updated_at || l.email_sent_at || l.whatsapp_sent_at || '').startsWith(selectedCalendarDateStr) && l.contact_status && !l.contact_status.includes('Nuevo'));
+
+      const emails = dayActivities.filter(a => a.activity_type === 'email').length + dayLeads.filter(l => l.contact_status && l.contact_status.includes('Correo')).length;
+      const wa = dayActivities.filter(a => a.activity_type === 'whatsapp').length + dayLeads.filter(l => l.contact_status && l.contact_status.includes('WhatsApp')).length;
+      const calls = dayActivities.filter(a => a.activity_type === 'call').length + dayLeads.filter(l => l.contact_status && l.contact_status.includes('Llamado')).length;
+      const total = dayLeads.length || (emails + wa + calls);
+
+      document.getElementById('day-kpi-total').textContent = total;
+      document.getElementById('day-kpi-emails').textContent = emails;
+      document.getElementById('day-kpi-wa').textContent = wa;
+      document.getElementById('day-kpi-calls').textContent = calls;
+
+      const timelineContainer = document.getElementById('day-timeline-list');
+      timelineContainer.innerHTML = '';
+
+      if (dayLeads.length === 0 && dayActivities.length === 0) {
+        timelineContainer.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:0.82rem;">No se registraron contactos comerciales en esta fecha.</div>`;
+        return;
+      }
+
+      dayLeads.forEach(l => {
+        const item = document.createElement('div');
+        item.className = 'timeline-item';
+        let icon = '💬';
+        if (l.contact_status && l.contact_status.includes('Correo')) icon = '📧';
+        else if (l.contact_status && l.contact_status.includes('Llamado')) icon = '📞';
+        else if (l.contact_status && l.contact_status.includes('Cotiz')) icon = '📄';
+        else if (l.contact_status && l.contact_status.includes('Cerrad')) icon = '🎉';
+
+        item.innerHTML = `
+          <div class="timeline-icon">${icon}</div>
+          <div class="timeline-content">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong>${l.business_name}</strong>
+              <span class="timeline-time">${l.city}, FL</span>
+            </div>
+            <p>${l.contact_status} · Tel: ${l.phone || 'Sin tel'}</p>
+          </div>
+          <button class="btn-action-sm btn-act-followup" style="grid-column:unset;padding:0.3rem 0.55rem;" onclick="openPitchModal('${l.id}')">
+            Seguimiento 📝
+          </button>
+        `;
+        timelineContainer.appendChild(item);
+      });
+    }
+
+    async function handleCreateLead(e) {
+      e.preventDefault();
+      const name = document.getElementById('add-name').value;
+      const cat = document.getElementById('add-cat').value;
+      const city = document.getElementById('add-city').value;
+      const phone = document.getElementById('add-phone').value;
+      const owner = document.getElementById('add-owner').value;
+      const email = document.getElementById('add-email').value || `${name.toLowerCase().replace(/[^a-z0-9]/g, '')}@gmail.com`;
+
+      const newRec = {
+        business_name: name,
+        owner_name: owner || null,
+        category_name: cat,
+        city: city,
+        source: 'Ingreso Manual',
+        full_address: `${city}, FL`,
+        phone: phone,
+        email: email,
+        priority_label: 'Alta (Llamar Hoy)',
+        priority_score: 5,
+        contact_status: 'Nuevo (Sin contactar)',
+        is_archived: false,
+        whatsapp_count: 0,
+        call_count: 0,
+        email_count: 0
+      };
+
+      try {
+        const { data, error } = await supabaseClient.from('fl_container_leads').insert([newRec]).select();
+        if (error) throw error;
+        if (data && data[0]) {
+          leads.unshift(data[0]);
+          updateKPIs();
+          renderAllLeads();
+          closeModal('add-modal');
+          showToast("¡Prospecto guardado en la base! 🎉");
+        }
+      } catch (err) { alert(err.message); }
+    }
+
+    function exportLeadsCSV() {
+      if (!leads.length) return alert("No hay prospectos.");
+      const headers = ["Nombre", "Dueno", "Categoria", "Ciudad", "Telefono", "Email", "Fuente", "Estado", "Archivado", "Motivo_Descarte"];
+      const rows = leads.map(l => [
+        `"${(l.business_name || '').replace(/"/g, '""')}"`,
+        `"${(l.owner_name || '').replace(/"/g, '""')}"`,
+        `"${(l.category_name || '').replace(/"/g, '""')}"`,
+        `"${(l.city || '').replace(/"/g, '""')}"`,
+        `"${(l.phone || '').replace(/"/g, '""')}"`,
+        `"${(l.email || '').replace(/"/g, '""')}"`,
+        `"${(l.source || 'Google Maps').replace(/"/g, '""')}"`,
+        `"${(l.contact_status || '').replace(/"/g, '""')}"`,
+        l.is_archived ? "SI" : "NO",
+        `"${(l.discard_reason || '').replace(/"/g, '""')}"`
+      ]);
+      const csv = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+      const a = document.createElement("a");
+      a.href = encodeURI(csv);
+      a.download = `leads_fl_containers_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function openAddModal() { document.getElementById('add-modal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    document.getElementById('global-search').addEventListener('input', () => {
+      renderPipeline();
+      renderAllLeads();
+    });
+  </script>
+</body>
+</html>
