@@ -938,6 +938,96 @@
       align-items: center;
     }
 
+    /* LANGUAGE PILLS & AUTOPILOT CSS */
+    .lang-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.18rem 0.45rem;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition);
+      border: 1px solid transparent;
+    }
+    .lang-pill:hover { opacity: 0.85; transform: scale(1.05); }
+    .lang-pill-en { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+    [data-theme="dark"] .lang-pill-en { background: #1e3a8a; color: #93c5fd; border-color: #3b82f6; }
+    .lang-pill-es { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+    [data-theme="dark"] .lang-pill-es { background: #7f1d1d; color: #fca5a5; border-color: #ef4444; }
+
+    .autopilot-progress-wrap {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .autopilot-progress-bar-bg {
+      width: 100%;
+      height: 12px;
+      background: rgba(0,0,0,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 0.6rem 0;
+    }
+    [data-theme="dark"] .autopilot-progress-bar-bg { background: rgba(255,255,255,0.1); }
+    .autopilot-progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #7c3aed 0%, #3b82f6 50%, #10b981 100%);
+      border-radius: 10px;
+      transition: width 0.3s ease;
+    }
+    .autopilot-terminal-feed {
+      background: #090d16;
+      color: #38bdf8;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.76rem;
+      border-radius: 10px;
+      padding: 0.85rem;
+      height: 140px;
+      overflow-y: auto;
+      border: 1px solid #1e293b;
+      margin-top: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .autopilot-log-row {
+      display: flex;
+      gap: 0.5rem;
+      line-height: 1.4;
+    }
+    .autopilot-log-time { color: #64748b; font-size: 0.7rem; }
+    .autopilot-img-preview-card {
+      background: var(--input-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0.5rem 0;
+    }
+    .autopilot-img-preview-card img {
+      width: 80px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+    .pulse-btn {
+      animation: pulse-green 2s infinite;
+    }
+    @keyframes pulse-green {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+      70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
     /* ==========================================
        RESPONSIVE CSS (MOBILE & TABLET ADAPTATION)
        ========================================== */
@@ -1130,6 +1220,9 @@
           </button>
 
           <div class="status-pill">🟢 Online</div>
+          <button class="btn-new-lead" style="background:linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);color:#fff;box-shadow:0 2px 8px rgba(124,58,237,0.35);" onclick="openAutoPilotModal()">
+            🤖 Auto-Pilot Cold Email
+          </button>
           <button class="btn-new-lead" onclick="openAddModal()">➕ Lead</button>
         </div>
       </header>
@@ -1532,13 +1625,17 @@
             <div class="batch-bar-left">
               <input type="checkbox" id="select-all-checkbox" style="transform:scale(1.2);cursor:pointer;" onchange="toggleSelectAll(this.checked)">
               <span style="font-size:0.85rem;font-weight:700;" id="batch-selected-label">0 seleccionados</span>
-              <button class="btn-action-sm" style="background:#334155;color:#fff;padding:0.35rem 0.65rem;" onclick="selectFirstN(5)">⚡ 5</button>
-              <button class="btn-action-sm" style="background:#1e293b;color:#38bdf8;padding:0.35rem 0.65rem;" onclick="selectFirstN(25)">⚡ 25</button>
+              <button class="btn-action-sm" style="background:#334155;color:#fff;padding:0.35rem 0.65rem;" onclick="selectFirstN(25)">⚡ 25</button>
+              <button class="btn-action-sm" style="background:#1e293b;color:#38bdf8;padding:0.35rem 0.65rem;" onclick="selectFirstN(50)">⚡ 50</button>
+              <button class="btn-action-sm" style="background:#1e293b;color:#a855f7;padding:0.35rem 0.65rem;" onclick="selectFirstN(100)">🔥 100</button>
             </div>
 
-            <div class="batch-actions">
+            <div class="batch-actions" style="display:flex;gap:0.45rem;flex-wrap:wrap;">
+              <button class="btn-batch-ai" style="background:linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);" onclick="openAutoPilotModal()">
+                <span>🤖 Auto-Pilot Cold Email (25 / 50 / 100)</span>
+              </button>
               <button class="btn-batch-ai" onclick="openAIBatchModal()">
-                <span>🤖 Redactar y Enviar Propuestas con IA</span>
+                <span>✉️ Revisar Propuestas Individuales</span>
               </button>
             </div>
           </div>
@@ -1895,13 +1992,118 @@
     </div>
   </div>
 
-  <!-- MODAL AGENTE IA DE PROPUESTAS POR CORREO -->
-  <div class="modal-overlay" id="ai-email-modal">
-    <div class="modal">
+  <!-- MODAL AGENTE AUTO-PILOT DE CORREOS EN FRÍO -->
+  <div class="modal-overlay" id="autopilot-modal">
+    <div class="modal" style="max-width:780px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;">
         <div>
-          <h3 style="font-size:1.2rem;font-weight:800;color:#7c3aed;">🤖 Agente IA de Propuestas por Correo</h3>
-          <p style="font-size:0.8rem;color:var(--text-muted);">Propuestas redactadas a la medida del negocio y su localidad en Florida.</p>
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;">
+            <span style="font-size:1.4rem;">🤖</span>
+            <h3 style="font-size:1.25rem;font-weight:800;color:var(--primary);margin:0;">Agente Auto-Pilot de Envíos en Frío</h3>
+            <span id="autopilot-status-badge" class="status-pill" style="background:#ede9fe;color:#6d28d9;font-weight:800;">⚪ En Espera</span>
+          </div>
+          <p style="font-size:0.8rem;color:var(--text-muted);">Envío automático y personalizado de primer contacto B2B (Sin precios · Alta tasa de respuesta).</p>
+        </div>
+        <button onclick="closeAutoPilotModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#94a3b8;">&times;</button>
+      </div>
+
+      <!-- Configuración del Lote de Envío -->
+      <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:12px;padding:0.9rem;margin-bottom:0.85rem;">
+        <div style="font-size:0.72rem;font-weight:800;color:var(--text-muted);margin-bottom:0.45rem;">⚙️ CONFIGURACIÓN DEL LOTE DE PROSPECCIÓN:</div>
+        
+        <div style="display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:0.65rem;margin-bottom:0.65rem;">
+          <div>
+            <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">CANTIDAD DE CONTACTOS</label>
+            <select id="autopilot-batch-size" class="filter-select" style="width:100%;padding:0.5rem;" onchange="updateAutoPilotPreview()">
+              <option value="25" selected>⚡ 25 Prospectos</option>
+              <option value="50">⚡ 50 Prospectos</option>
+              <option value="100">🔥 100 Prospectos</option>
+              <option value="all">🌐 Todos los Nuevos</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">ESTRATEGIA DE IDIOMA</label>
+            <select id="autopilot-lang-mode" class="filter-select" style="width:100%;padding:0.5rem;" onchange="updateAutoPilotPreview()">
+              <option value="auto" selected>🌐 Detección Inteligente (EN / ES)</option>
+              <option value="en">🇺🇸 Solo Inglés (English Outreach)</option>
+              <option value="es">🇪🇸 Solo Español</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size:0.7rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">VELOCIDAD DE ENVÍO</label>
+            <select id="autopilot-speed" class="filter-select" style="width:100%;padding:0.5rem;">
+              <option value="fast" selected>⚡ Rápido (800ms / correo)</option>
+              <option value="safe">🛡️ Modo Seguro Anti-Spam (2.5s)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;border-top:1px dashed var(--border);padding-top:0.6rem;">
+          <label style="display:inline-flex;align-items:center;gap:0.45rem;font-size:0.78rem;font-weight:700;color:var(--text-main);cursor:pointer;">
+            <input type="checkbox" id="autopilot-attach-img" checked onchange="updateAutoPilotPreview()">
+            <span>🖼️ Adjuntar foto de inventario real en patio de Florida</span>
+          </label>
+          <span style="font-size:0.72rem;color:var(--text-muted);font-weight:700;" id="autopilot-queue-summary">0 prospectos en cola</span>
+        </div>
+      </div>
+
+      <!-- Previsualización del Primer Correo en Cola -->
+      <div style="border:1px solid var(--border);border-radius:12px;padding:0.85rem;margin-bottom:0.85rem;background:var(--card-bg);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+          <span style="font-size:0.72rem;font-weight:800;color:var(--primary);">👁️ VISTA PREVIA DEL PRIMER CORREO EN COLA:</span>
+          <span id="autopilot-preview-lang-badge" class="lang-pill lang-pill-en">🇺🇸 English</span>
+        </div>
+        <div id="autopilot-preview-subject" style="font-size:0.82rem;font-weight:800;color:var(--text-main);margin-bottom:0.35rem;"></div>
+        <div id="autopilot-preview-body" style="font-size:0.76rem;color:var(--text-muted);white-space:pre-line;line-height:1.45;background:var(--input-bg);padding:0.65rem;border-radius:8px;max-height:95px;overflow-y:auto;"></div>
+        <div id="autopilot-preview-img-box" style="margin-top:0.45rem;"></div>
+      </div>
+
+      <!-- Monitor y Barra de Progreso en Vivo -->
+      <div class="autopilot-progress-wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.82rem;font-weight:800;color:var(--text-main);">Barra de Progreso en Vivo:</span>
+          <span id="autopilot-progress-text" style="font-size:0.82rem;font-weight:800;color:var(--primary);">0% (0/0)</span>
+        </div>
+        <div class="autopilot-progress-bar-bg">
+          <div id="autopilot-progress-bar-fill" class="autopilot-progress-bar-fill"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text-muted);">
+          <span>🇺🇸 EN Enviados: <strong id="autopilot-count-en" style="color:var(--text-main);">0</strong></span>
+          <span>🇪🇸 ES Enviados: <strong id="autopilot-count-es" style="color:var(--text-main);">0</strong></span>
+          <span>Restantes: <strong id="autopilot-count-remaining" style="color:var(--text-main);">0</strong></span>
+        </div>
+        <div class="autopilot-terminal-feed" id="autopilot-terminal-feed">
+          <div class="autopilot-log-row">
+            <span class="autopilot-log-time">[00:00:00]</span>
+            <span>Agente listo para iniciar despacho. Selecciona el tamaño de lote y presiona Iniciar.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de Control de Ejecución -->
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:0.85rem;flex-wrap:wrap;gap:0.5rem;">
+        <button type="button" class="btn-new-lead" style="background:var(--border);color:var(--text-main);" onclick="closeAutoPilotModal()">Cerrar</button>
+
+        <div style="display:flex;gap:0.45rem;">
+          <button id="btn-autopilot-stop" type="button" class="btn-new-lead" style="background:#ef4444;display:none;" onclick="stopAutoPilot()">⏹️ Detener</button>
+          <button id="btn-autopilot-pause" type="button" class="btn-new-lead" style="background:#f59e0b;color:#000;display:none;" onclick="pauseAutoPilot()">⏸️ Pausar</button>
+          <button id="btn-autopilot-start" type="button" class="btn-new-lead pulse-btn" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="startAutoPilot()">
+            🚀 Iniciar Auto-Pilot de Envíos
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL AGENTE IA DE PROPUESTAS POR CORREO -->
+  <div class="modal-overlay" id="ai-email-modal">
+    <div class="modal" style="max-width:750px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;">
+        <div>
+          <h3 style="font-size:1.2rem;font-weight:800;color:#7c3aed;">🤖 Propuesta de Primer Contacto en Frío</h3>
+          <p style="font-size:0.8rem;color:var(--text-muted);">Redactada en base al nicho, ciudad e idioma del prospecto (Sin precios, enfoque B2B).</p>
         </div>
         <button onclick="closeModal('ai-email-modal')" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#94a3b8;">&times;</button>
       </div>
@@ -2748,6 +2950,7 @@
         const isSelected = selectedLeadIds.has(lead.id);
         const isNew = !lead.contact_status || lead.contact_status.includes('Nuevo');
         const timeInfo = getLeadTimeInfo(lead);
+        const lang = detectLeadLanguage(lead);
         const card = document.createElement('div');
         card.className = `lead-pool-card ${isSelected ? 'selected' : ''}`;
 
@@ -2761,7 +2964,10 @@
                   ${lead.owner_name ? `<span style="font-size:0.7rem;color:#10b981;font-weight:700;">👤 Dueño: ${lead.owner_name}</span>` : ''}
                 </div>
               </div>
-              <span class="aging-pill ${isNew ? 'aging-recent' : timeInfo.badgeClass}">${isNew ? '⚪ Nuevo' : timeInfo.label}</span>
+              <div style="display:flex;align-items:center;gap:0.3rem;">
+                <span class="lang-pill ${lang === 'EN' ? 'lang-pill-en' : 'lang-pill-es'}" onclick="toggleLeadLang('${lead.id}', event)" title="Clic para alternar idioma">${lang === 'EN' ? '🇺🇸 EN' : '🇪🇸 ES'}</span>
+                <span class="aging-pill ${isNew ? 'aging-recent' : timeInfo.badgeClass}">${isNew ? '⚪ Nuevo' : timeInfo.label}</span>
+              </div>
             </div>
 
             <span class="source-tag">🏷️ ${lead.source || 'Google Maps'}</span>
@@ -2777,7 +2983,7 @@
           <div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.35rem;">
               <button onclick="openSingleAIModal('${lead.id}')" class="btn-action-sm btn-act-email" style="grid-column:span 2;">
-                🤖 Propuesta Correo IA
+                🤖 Propuesta en Frío (${lang === 'EN' ? '🇺🇸 EN' : '🇪🇸 ES'})
               </button>
               ${lead.phone ? `<button onclick="trackCall('${lead.id}', 'tel:${lead.phone.replace(/\D/g,'')}')" class="btn-action-sm btn-act-call">📞 Llamar</button>` : ''}
               ${lead.whatsapp_link ? `<button onclick="trackWhatsApp('${lead.id}', '${lead.whatsapp_link}')" class="btn-action-sm btn-act-wa">💬 WA</button>` : ''}
@@ -2804,6 +3010,7 @@
         const isSelected = selectedLeadIds.has(lead.id);
         const isNew = !lead.contact_status || lead.contact_status.includes('Nuevo');
         const timeInfo = getLeadTimeInfo(lead);
+        const lang = detectLeadLanguage(lead);
         const tr = document.createElement('tr');
         if (isSelected) tr.classList.add('selected');
 
@@ -2820,11 +3027,13 @@
             <span>${lead.email || '—'}</span>
             ${lead.email_verified ? '<span style="color:#10b981;font-size:0.7rem;font-weight:800;"> ✅</span>' : ''}
           </td>
-          <td><span class="source-tag" style="margin:0;">${lead.source || 'Google Maps'}</span></td>
+          <td>
+            <span class="lang-pill ${lang === 'EN' ? 'lang-pill-en' : 'lang-pill-es'}" onclick="toggleLeadLang('${lead.id}', event)" title="Clic para alternar idioma">${lang === 'EN' ? '🇺🇸 EN' : '🇪🇸 ES'}</span>
+          </td>
           <td><span class="aging-pill ${isNew ? 'aging-recent' : timeInfo.badgeClass}">${isNew ? '⚪ Nuevo' : timeInfo.label}</span></td>
           <td style="text-align:right;">
             <div style="display:inline-flex;gap:0.25rem;">
-              <button onclick="openSingleAIModal('${lead.id}')" class="btn-action-sm btn-act-email" title="Enviar Propuesta IA">📧</button>
+              <button onclick="openSingleAIModal('${lead.id}')" class="btn-action-sm btn-act-email" title="Enviar Propuesta en Frío">📧</button>
               ${lead.phone ? `<button onclick="trackCall('${lead.id}', 'tel:${lead.phone.replace(/\D/g,'')}')" class="btn-action-sm btn-act-call" title="Llamar">📞</button>` : ''}
               ${lead.whatsapp_link ? `<button onclick="trackWhatsApp('${lead.id}', '${lead.whatsapp_link}')" class="btn-action-sm btn-act-wa" title="WhatsApp">💬</button>` : ''}
               <button onclick="openDiscardModal('${lead.id}')" class="btn-action-sm btn-act-discard" style="grid-column:unset;" title="Descartar">❌</button>
@@ -2867,64 +3076,213 @@
     }
 
     // ==========================================
-    // AGENTE IA: REDACCIÓN DE PROPUESTAS ESPECÍFICAS
+    // GALERÍA DE FOTOS REALES DE CONTENEDORES
     // ==========================================
-    function generateAIProposal(lead) {
-      const name = lead.business_name || "Equipo Directivo";
+    const CONTAINER_PHOTOS = [
+      { id: 1, name: "20ft Dry Storage Unit (Clean Yard)", url: "Imagenes/container_1.jpeg" },
+      { id: 2, name: "40ft High Cube Delivery in Florida", url: "Imagenes/container_2.jpeg" },
+      { id: 3, name: "One-Trip New Container Yard Stock", url: "Imagenes/container_3.jpeg" },
+      { id: 4, name: "Cargo Worthy (CW) Certified Unit", url: "Imagenes/container_4.jpeg" },
+      { id: 5, name: "Job-site Direct Tilt-Bed Placement", url: "Imagenes/container_5.jpeg" },
+      { id: 6, name: "Commercial & Agricultural Container Fleet", url: "Imagenes/container_6.jpeg" }
+    ];
+
+    // ==========================================
+    // DETECCIÓN DE IDIOMA Y CORREOS EN FRÍO B2B (SIN PRECIOS)
+    // ==========================================
+    function detectLeadLanguage(lead) {
+      if (lead.lang && (lead.lang === 'EN' || lead.lang === 'ES')) return lead.lang;
+      
+      const owner = (lead.owner_name || '').toLowerCase();
+      const business = (lead.business_name || '').toLowerCase();
+      const city = (lead.city || '').toLowerCase();
+
+      const hispanicCues = /(rodriguez|hernandez|gonzalez|garcia|martinez|lopez|perez|sanchez|ramirez|torres|flores|rivera|gomez|diaz|cruz|reyes|morales|gutierrez|ortiz|ramos|chavez|mendoza|ruiz|alvarez|castillo|jimenez|vasquez|moreno|herrera|medina|aguilar|vargas|castro|guzman|velasquez|romero|suarez|peña|salazar|delgado|espinoza|rojas|rancho|mariscos|floreria|vivero|techado|asfalto|construccion|distribuidora|transportes|alimentos|taller|mecanica|hermanos|latino|tropical)/i;
+
+      if (hispanicCues.test(owner) || hispanicCues.test(business)) return 'ES';
+      if (city === 'hialeah' || city === 'doral' || city === 'homestead') return 'ES';
+      
+      return 'EN';
+    }
+
+    async function toggleLeadLang(leadId, e) {
+      if (e) e.stopPropagation();
+      const l = leads.find(x => x.id === leadId);
+      if (!l) return;
+      const cur = detectLeadLanguage(l);
+      const next = cur === 'EN' ? 'ES' : 'EN';
+      l.lang = next;
+      renderPipeline();
+      renderAllLeads();
+      showToast(`Idioma para "${l.business_name}" cambiado a ${next === 'EN' ? '🇺🇸 Inglés' : '🇪🇸 Español'}`);
+
+      try {
+        await supabaseClient.from('fl_container_leads').update({
+          notes: (l.notes || '') + ` [Lang:${next}]`,
+          updated_at: new Date()
+        }).eq('id', leadId);
+      } catch (err) { console.error(err); }
+    }
+
+    function generateColdOutreachEmail(lead, forcedLang = null) {
+      const lang = forcedLang || detectLeadLanguage(lead);
+      const name = lead.business_name || "Operations Team";
+      const owner = lead.owner_name ? lead.owner_name.split(' ')[0] : null;
       const cat = (lead.category_name || "").toLowerCase();
       const city = lead.city || "Florida";
 
-      let specificPitch = "";
-      if (cat.includes("construcción") || cat.includes("techado") || cat.includes("contratista")) {
-        specificPitch = `Sabemos que en sus proyectos de construcción y obras activas en ${city}, resguardar herramientas de alto valor, generadores, andamios y materiales contra robos y el clima es crítico. Nuestros contenedores marítimos de 20 y 40 pies son 100% herméticos y resistentes a huracanes, con entrega directa a la obra en 24-48h.`;
-      } else if (cat.includes("carretera") || cat.includes("asfalto") || cat.includes("vial")) {
-        specificPitch = `Para sus cuadrillas y faenas de pavimentación y mantenimiento vial en ${city}, proveemos contenedores de acero corrugado de alta resistencia, ideales como bodegas móviles a pie de carretera para herramientas pesadas y señalización.`;
-      } else if (cat.includes("supermercado") || cat.includes("alimento") || cat.includes("mayorista")) {
-        specificPitch = `Para responder a picos de demanda y temporadas de alto inventario en ${city}, nuestros contenedores marítimos secos (Dry Vans) ofrecen almacenamiento inmediato para cajas, estibas y productos no perecederos sin los altos costos de arrendar bodegas adicionales.`;
-      } else if (cat.includes("farmacéutica") || cat.includes("médico") || cat.includes("laboratorio")) {
-        specificPitch = `Proveemos contenedores One-Trip de primer uso con sellos de máxima hermeticidad, ideales para resguardo de empaques, insumos médicos y equipos de laboratorio en ${city}.`;
-      } else if (cat.includes("envíos") || cat.includes("carga") || cat.includes("logística") || cat.includes("exportación")) {
-        specificPitch = `Contamos con disponibilidad inmediata de contenedores Cargo Worthy (CW) certificados y One-Trip listos para exportación y consolidación hacia el Caribe y Latinoamérica con despacho inmediato a patio o puertos de Florida.`;
-      } else if (cat.includes("florería") || cat.includes("flores") || cat.includes("vivero") || cat.includes("finca") || cat.includes("rancho")) {
-        specificPitch = `Nuestros contenedores marítimos herméticos son la solución preferida por viveros y ranchos en ${city} para resguardar fertilizantes, herramientas, macetas y sistemas de riego protegidos contra plagas, humedad y lluvias.`;
-      } else if (cat.includes("eléctrica") || cat.includes("generador") || cat.includes("servicios")) {
-        specificPitch = `Para contratistas eléctricos y mantenimiento de redes en ${city}, ofrecemos bodegas de acero para bobinas de cable, transformadores y paneles bajo cerradura de alta seguridad.`;
-      } else if (cat.includes("telecom") || cat.includes("telefonía") || cat.includes("torres")) {
-        specificPitch = `Proveemos contenedores seguros para resguardo de fibra óptica, equipos de telecomunicación y repuestos de antenas en ${city}.`;
-      } else if (cat.includes("zoológico") || cat.includes("santuario") || cat.includes("acuario") || cat.includes("marina") || cat.includes("pesca")) {
-        specificPitch = `Entendemos las exigencias de almacenamiento de alimentos secos, aparejos de pesca, filtros y repuestos en instalaciones marinas y santuarios en ${city}, garantizando protección contra el salitre y la intemperie.`;
-      } else if (cat.includes("motocross") || cat.includes("atv") || cat.includes("mudding") || cat.includes("off-road")) {
-        specificPitch = `Muchos talleres y pistas de Motocross, ATVs y Mudding en Florida utilizan nuestros contenedores como talleres cerrados y bodegas blindadas para motos, quads, repuestos, llantas y combustible con máxima seguridad.`;
-      } else if (cat.includes("taller") || cat.includes("mecánico") || cat.includes("auto body") || cat.includes("yonke")) {
-        specificPitch = `Muchos talleres mecánicos en ${city} optimizan su espacio utilizando contenedores secos para almacenar motores, transmisiones y repuestos de alto valor bajo llave, reduciendo costos frente al alquiler de bodegas tradicionales.`;
+      let subject = "";
+      let body = "";
+      let photo = CONTAINER_PHOTOS[0];
+
+      if (lang === 'EN') {
+        const greeting = owner ? `Hi ${owner},` : `Hi ${name} Team,`;
+
+        if (cat.includes("construcción") || cat.includes("techado") || cat.includes("contratista") || cat.includes("construction") || cat.includes("roofing") || cat.includes("paving")) {
+          subject = `Quick question regarding on-site storage for ${name} projects in ${city}`;
+          body = `${greeting}
+
+I'm reaching out briefly because we work with general contractors and roofing companies across ${city} and surrounding Florida areas providing secure, weather-tight on-site shipping containers for tools, materials, and heavy equipment protection.
+
+We handle direct 24-48h tilt-bed deliveries across Florida so containers are placed exactly where you need them on-site.
+
+Do you currently have any active job sites or upcoming projects in ${city} where you could use extra on-site secure storage?
+
+Best regards,
+
+FL Container Chassis Operations
+Miami, FL · (786) 873-9650
+https://flcontainerchassis.com/es/`;
+          photo = CONTAINER_PHOTOS[4]; // Job-site Tilt-Bed
+        } else if (cat.includes("vivero") || cat.includes("finca") || cat.includes("rancho") || cat.includes("florería") || cat.includes("nursery") || cat.includes("farm")) {
+          subject = `Secure ground-level weather-tight storage for ${name} in ${city}`;
+          body = `${greeting}
+
+We provide heavy-duty weather-tight ground storage containers for nurseries, farms, and acreage properties across ${city} and surrounding Florida areas.
+
+They provide instant, pest-free, and hurricane-resistant storage for equipment, feed, tools, and seasonal inventory without requiring permanent building permits.
+
+Are you looking to expand your secure storage capacity on your property this season?
+
+Best regards,
+
+FL Container Chassis Operations
+Miami, FL · (786) 873-9650
+https://flcontainerchassis.com/es/`;
+          photo = CONTAINER_PHOTOS[0]; // 20ft Dry Storage
+        } else if (cat.includes("envíos") || cat.includes("carga") || cat.includes("logística") || cat.includes("exportación") || cat.includes("freight") || cat.includes("logistics")) {
+          subject = `Cargo Worthy (CW) & SOC containers availability in South Florida — ${name}`;
+          body = `${greeting}
+
+We supply certified Cargo Worthy (CW) and One-Trip shipper-owned containers (SOC) for freight forwarders and export logistics operators out of South Florida.
+
+All units come with full CSC safety certification ready for ocean export and interchange across all Florida ports.
+
+Are you currently sourcing 20ft or 40ft containers for your upcoming ocean shipments?
+
+Best regards,
+
+FL Container Chassis Operations
+Miami, FL · (786) 873-9650
+https://flcontainerchassis.com/es/`;
+          photo = CONTAINER_PHOTOS[3]; // CW Certified
+        } else {
+          subject = `Heavy-duty secure on-site storage for ${name} in ${city}`;
+          body = `${greeting}
+
+Reaching out to see if your facility in ${city} requires additional weather-tight commercial storage for surplus inventory, parts, or equipment.
+
+We deliver 20ft & 40ft units directly to your commercial lot within 24-48 hours.
+
+Would you be open to a quick chat if you have any storage needs coming up?
+
+Best regards,
+
+FL Container Chassis Operations
+Miami, FL · (786) 873-9650
+https://flcontainerchassis.com/es/`;
+          photo = CONTAINER_PHOTOS[1]; // 40ft High Cube
+        }
       } else {
-        specificPitch = `Proveemos contenedores marítimos de 20ft y 40ft ideales para almacenamiento seco y seguro de inventario y materiales en ${city}, con despacho garantizado en 24-48h.`;
+        // SPANISH TEMPLATES
+        const greeting = owner ? `Hola ${owner},` : `Estimado equipo de ${name},`;
+
+        if (cat.includes("construcción") || cat.includes("techado") || cat.includes("contratista") || cat.includes("carretera") || cat.includes("asfalto")) {
+          subject = `Almacenamiento seguro en sitio para proyectos de ${name} en ${city}`;
+          body = `${greeting}
+
+Le escribo brevemente porque estamos apoyando a contratistas y empresas de construcción en el área de ${city} con contenedores marítimos herméticos para resguardo seguro de herramientas, maquinaria y materiales directamente en obra.
+
+Entregamos directamente en sitio con camión tilt-bed en 24-48 horas en todo el condado.
+
+¿Tienen actualmente alguna obra o proyecto activo en ${city} donde necesiten espacio de almacenamiento seguro?
+
+Saludos cordiales,
+
+FL Container Chassis Miami
+(786) 873-9650 · (786) 895-2459
+https://flcontainerchassis.com/es/
+8421 NW 70th Street, Miami, FL 33166`;
+          photo = CONTAINER_PHOTOS[4];
+        } else if (cat.includes("vivero") || cat.includes("finca") || cat.includes("rancho") || cat.includes("florería")) {
+          subject = `Resguardo hermético de insumos y equipos para ${name} en ${city}`;
+          body = `${greeting}
+
+Nos ponemos en contacto con ustedes en ${city} ya que suministramos contenedores de almacenamiento herméticos y resistentes a la intemperie para fincas, viveros e industrias agrícolas en Florida.
+
+Son ideales para resguardo de fertilizantes, herramientas y equipos agrícolas sin necesidad de construcciones fijas ni permisos complejos.
+
+¿Tienen necesidad de ampliar su capacidad de almacenamiento en su terreno en este momento?
+
+Quedo atento a su respuesta,
+
+FL Container Chassis Miami
+(786) 873-9650 · (786) 895-2459
+https://flcontainerchassis.com/es/`;
+          photo = CONTAINER_PHOTOS[0];
+        } else if (cat.includes("envíos") || cat.includes("carga") || cat.includes("logística") || cat.includes("exportación")) {
+          subject = `Disponibilidad de unidades Cargo Worthy (CW) en Miami para ${name}`;
+          body = `${greeting}
+
+Le contactamos desde FL Container Chassis en Miami para presentarle nuestra disponibilidad inmediata de contenedores Cargo Worthy (CW) y One-Trip certificados para exportación marítima (SOC).
+
+Unidades listas para inspección y retiro en patio de Miami o entrega en puertos de Florida.
+
+¿Están cotizando actualmente unidades de 20 o 40 pies para sus próximos embarques?
+
+Saludos cordiales,
+
+FL Container Chassis Miami
+(786) 873-9650 · (786) 895-2459
+https://flcontainerchassis.com/es/`;
+          photo = CONTAINER_PHOTOS[3];
+        } else {
+          subject = `Almacenamiento hermético y seguro para ${name} en ${city}`;
+          body = `${greeting}
+
+Le escribo brevemente desde FL Container Chassis en Miami para verificar si en sus instalaciones de ${city} requieren espacio adicional de almacenamiento seguro para inventario, equipos o repuestos.
+
+Suministramos contenedores marítimos de 20ft y 40ft con despacho y descarga en 24-48 horas en toda Florida.
+
+¿Tienen actualmente alguna necesidad de almacenamiento hermético en sus instalaciones?
+
+Saludos cordiales,
+
+FL Container Chassis Miami
+(786) 873-9650 · (786) 895-2459
+https://flcontainerchassis.com/es/`;
+          photo = CONTAINER_PHOTOS[1];
+        }
       }
 
-      const subject = `Propuesta de Contenedores y Almacenamiento Seguro para ${name} — FL Container Chassis`;
-      const body = `Estimado equipo de ${name},
-
-Le saludamos cordialmente desde FL Container Chassis en Miami (8421 NW 70th Street).
-
-${specificPitch}
-
-CONDICIONES COMERCIALES DESTACADAS:
-• Unidades 20ft y 40ft WWT / Cargo Worthy desde $1,500.
-• Entrega garantizada en 24 a 48 horas en ${city} y toda Florida.
-• Cupón exclusivo de $300 OFF en su compra (Código: DISCOUNT$300).
-• Opción de alquiler flexible con descuento de $70 OFF.
-
-¿Le gustaría que le enviemos fotos del inventario disponible o coordinar una entrega esta semana?
-
-Quedamos a su entera disposición.
-
-Atentamente,
-Asesor Comercial | FL Container Chassis Miami
-Teléfono: (786) 873-9650 / (786) 895-2459
-Sitio Web: https://flcontainerchassis.com/es/
-8421 NW 70th Street, Miami, FL 33166`;
-
-      return { subject, body };
+      return {
+        lang,
+        subject,
+        body,
+        photo,
+        recipientEmail: lead.email || `${lead.business_name.toLowerCase().replace(/[^a-z0-9]/g, '')}@gmail.com`,
+        recipientName: lead.business_name
+      };
     }
 
     function openAIBatchModal() {
@@ -2935,9 +3293,8 @@ Sitio Web: https://flcontainerchassis.com/es/
       document.getElementById('modal-selected-summary').textContent = `${selectedLeads.length} propuestas listas`;
 
       selectedLeads.forEach(lead => {
-        const { subject, body } = generateAIProposal(lead);
-        const targetEmail = lead.email || `${lead.business_name.toLowerCase().replace(/[^a-z0-9]/g, '')}@gmail.com`;
-        const mailtoUrl = `mailto:${targetEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const emailData = generateColdOutreachEmail(lead);
+        const mailtoUrl = `mailto:${emailData.recipientEmail}?subject=${encodeURIComponent(emailData.subject)}&body=${encodeURIComponent(emailData.body)}`;
 
         const item = document.createElement('div');
         item.className = 'proposal-card-item';
@@ -2945,18 +3302,290 @@ Sitio Web: https://flcontainerchassis.com/es/
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;flex-wrap:wrap;gap:0.4rem;">
             <div>
               <strong style="font-size:0.92rem;color:var(--text-main);">${lead.business_name}</strong>
+              <span class="lang-pill ${emailData.lang === 'EN' ? 'lang-pill-en' : 'lang-pill-es'}" style="margin-left:0.35rem;">${emailData.lang === 'EN' ? '🇺🇸 English' : '🇪🇸 Español'}</span>
               <span style="font-size:0.72rem;color:var(--text-muted);margin-left:0.35rem;">📍 ${lead.city}, FL · 🏷️ ${lead.source || 'Google Maps'}</span>
             </div>
-            <a href="${mailtoUrl}" target="_blank" class="btn-action-sm btn-act-email" onclick="trackEmailSent('${lead.id}')">
-              📧 Abrir Correo y Enviar
-            </a>
+            <div style="display:flex;gap:0.3rem;">
+              <button class="btn-action-sm" style="background:var(--input-bg);border:1px solid var(--border);" onclick="copyToClipboard(\`${emailData.body.replace(/`/g, '\\`')}\`)">📋 Copiar</button>
+              <a href="${mailtoUrl}" target="_blank" class="btn-action-sm btn-act-email" onclick="trackEmailSent('${lead.id}')">
+                📧 Abrir y Enviar
+              </a>
+            </div>
           </div>
-          <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.35rem;"><strong>Asunto:</strong> ${subject}</div>
-          <textarea style="width:100%;font-size:0.75rem;font-family:inherit;padding:0.45rem;border:1px solid var(--border);border-radius:6px;min-height:85px;background:var(--card-bg);color:var(--text-main);" readonly>${body}</textarea>
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.35rem;"><strong>Asunto:</strong> ${emailData.subject}</div>
+          <textarea style="width:100%;font-size:0.75rem;font-family:inherit;padding:0.45rem;border:1px solid var(--border);border-radius:6px;min-height:85px;background:var(--card-bg);color:var(--text-main);" readonly>${emailData.body}</textarea>
+          ${emailData.photo ? `
+            <div class="autopilot-img-preview-card" style="margin-top:0.4rem;">
+              <img src="${emailData.photo.url}" alt="${emailData.photo.name}">
+              <div>
+                <span style="font-size:0.72rem;font-weight:700;color:var(--text-main);">Foto adjunta: ${emailData.photo.name}</span><br>
+                <small style="font-size:0.65rem;color:var(--text-muted);">Foto de inventario real en Florida</small>
+              </div>
+            </div>
+          ` : ''}
         `;
         container.appendChild(item);
       });
       document.getElementById('ai-email-modal').style.display = 'flex';
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("¡Texto copiado al portapapeles! 📋");
+      }).catch(() => {
+        showToast("Copiado.");
+      });
+    }
+
+    // ==========================================
+    // AGENTE AUTO-PILOT COLD EMAIL ENGINE
+    // ==========================================
+    let autopilotState = {
+      isRunning: false,
+      isPaused: false,
+      queue: [],
+      currentIndex: 0,
+      countEn: 0,
+      countEs: 0,
+      timerId: null
+    };
+
+    function openAutoPilotModal() {
+      if (autopilotState.isRunning) {
+        document.getElementById('autopilot-modal').style.display = 'flex';
+        return;
+      }
+      updateAutoPilotPreview();
+      document.getElementById('autopilot-modal').style.display = 'flex';
+    }
+
+    function closeAutoPilotModal() {
+      if (autopilotState.isRunning) {
+        if (!confirm("El Auto-Pilot sigue enviando en segundo plano. ¿Deseas cerrar la ventana y dejarlo correr?")) return;
+      }
+      document.getElementById('autopilot-modal').style.display = 'none';
+    }
+
+    function updateAutoPilotPreview() {
+      const batchSizeVal = document.getElementById('autopilot-batch-size').value;
+      const langMode = document.getElementById('autopilot-lang-mode').value;
+      const attachImg = document.getElementById('autopilot-attach-img').checked;
+
+      const uncontacted = leads.filter(l => !l.is_archived && (!l.contact_status || l.contact_status.includes('Nuevo')));
+      let targetPool = uncontacted.length > 0 ? uncontacted : leads.filter(l => !l.is_archived);
+
+      let count = targetPool.length;
+      if (batchSizeVal !== 'all') {
+        const n = parseInt(batchSizeVal);
+        targetPool = targetPool.slice(0, n);
+        count = targetPool.length;
+      }
+
+      document.getElementById('autopilot-queue-summary').textContent = `${count} prospectos seleccionados para esta campaña`;
+
+      if (targetPool.length > 0) {
+        const firstLead = targetPool[0];
+        const forcedLang = langMode === 'en' ? 'EN' : (langMode === 'es' ? 'ES' : null);
+        const emailData = generateColdOutreachEmail(firstLead, forcedLang);
+
+        const badge = document.getElementById('autopilot-preview-lang-badge');
+        badge.className = `lang-pill ${emailData.lang === 'EN' ? 'lang-pill-en' : 'lang-pill-es'}`;
+        badge.textContent = emailData.lang === 'EN' ? '🇺🇸 English' : '🇪🇸 Español';
+
+        document.getElementById('autopilot-preview-subject').textContent = `Asunto: ${emailData.subject}`;
+        document.getElementById('autopilot-preview-body').textContent = emailData.body;
+
+        const imgBox = document.getElementById('autopilot-preview-img-box');
+        if (attachImg && emailData.photo) {
+          imgBox.innerHTML = `
+            <div class="autopilot-img-preview-card">
+              <img src="${emailData.photo.url}" alt="${emailData.photo.name}">
+              <div>
+                <strong style="font-size:0.75rem;color:var(--text-main);">${emailData.photo.name}</strong><br>
+                <span style="font-size:0.68rem;color:#10b981;font-weight:700;">✅ Foto real de patio adjunta</span>
+              </div>
+            </div>
+          `;
+        } else {
+          imgBox.innerHTML = '';
+        }
+      } else {
+        document.getElementById('autopilot-preview-subject').textContent = 'No hay prospectos en la cola';
+        document.getElementById('autopilot-preview-body').textContent = 'Extrae prospectos con el Generador Multifuente para iniciar.';
+        document.getElementById('autopilot-preview-img-box').innerHTML = '';
+      }
+    }
+
+    function appendAutoPilotLog(msg) {
+      const feed = document.getElementById('autopilot-terminal-feed');
+      if (!feed) return;
+      const timeStr = new Date().toTimeString().slice(0, 8);
+      const row = document.createElement('div');
+      row.className = 'autopilot-log-row';
+      row.innerHTML = `<span class="autopilot-log-time">[${timeStr}]</span> <span>${msg}</span>`;
+      feed.appendChild(row);
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    function startAutoPilot() {
+      if (autopilotState.isPaused) {
+        autopilotState.isPaused = false;
+        autopilotState.isRunning = true;
+        setAutopilotUIState('running');
+        appendAutoPilotLog("▶️ Auto-Pilot reanudado.");
+        scheduleNextStep();
+        return;
+      }
+
+      const batchSizeVal = document.getElementById('autopilot-batch-size').value;
+      const uncontacted = leads.filter(l => !l.is_archived && (!l.contact_status || l.contact_status.includes('Nuevo')));
+      let queue = uncontacted.length > 0 ? uncontacted : leads.filter(l => !l.is_archived);
+
+      if (batchSizeVal !== 'all') {
+        queue = queue.slice(0, parseInt(batchSizeVal));
+      }
+
+      if (!queue.length) {
+        alert("No hay prospectos disponibles para procesar.");
+        return;
+      }
+
+      autopilotState.queue = queue;
+      autopilotState.currentIndex = 0;
+      autopilotState.countEn = 0;
+      autopilotState.countEs = 0;
+      autopilotState.isRunning = true;
+      autopilotState.isPaused = false;
+
+      setAutopilotUIState('running');
+      appendAutoPilotLog(`🚀 Iniciando campaña Auto-Pilot para ${queue.length} prospectos...`);
+      processAutoPilotStep();
+    }
+
+    function pauseAutoPilot() {
+      if (!autopilotState.isRunning) return;
+      autopilotState.isPaused = true;
+      autopilotState.isRunning = false;
+      if (autopilotState.timerId) clearTimeout(autopilotState.timerId);
+      setAutopilotUIState('paused');
+      appendAutoPilotLog(`⏸️ Auto-Pilot pausado en el contacto ${autopilotState.currentIndex} de ${autopilotState.queue.length}.`);
+    }
+
+    function stopAutoPilot() {
+      autopilotState.isRunning = false;
+      autopilotState.isPaused = false;
+      if (autopilotState.timerId) clearTimeout(autopilotState.timerId);
+      setAutopilotUIState('stopped');
+      appendAutoPilotLog(`⏹️ Campaña detenida por el usuario. Se procesaron ${autopilotState.currentIndex} correos.`);
+      updateKPIs();
+      renderPipeline();
+      renderAllLeads();
+    }
+
+    function setAutopilotUIState(st) {
+      const badge = document.getElementById('autopilot-status-badge');
+      const btnStart = document.getElementById('btn-autopilot-start');
+      const btnPause = document.getElementById('btn-autopilot-pause');
+      const btnStop = document.getElementById('btn-autopilot-stop');
+
+      if (st === 'running') {
+        badge.className = 'status-pill';
+        badge.style.background = '#dcfce7';
+        badge.style.color = '#15803d';
+        badge.textContent = '🟢 Despachando...';
+        btnStart.style.display = 'none';
+        btnPause.style.display = 'inline-block';
+        btnStop.style.display = 'inline-block';
+      } else if (st === 'paused') {
+        badge.className = 'status-pill';
+        badge.style.background = '#fef3c7';
+        badge.style.color = '#b45309';
+        badge.textContent = '⏸️ En Pausa';
+        btnStart.style.display = 'inline-block';
+        btnStart.textContent = '▶️ Reanudar Envío';
+        btnPause.style.display = 'none';
+        btnStop.style.display = 'inline-block';
+      } else {
+        badge.className = 'status-pill';
+        badge.style.background = '#ede9fe';
+        badge.style.color = '#6d28d9';
+        badge.textContent = '⚪ Listo';
+        btnStart.style.display = 'inline-block';
+        btnStart.textContent = '🚀 Iniciar Auto-Pilot';
+        btnPause.style.display = 'none';
+        btnStop.style.display = 'none';
+      }
+    }
+
+    async function processAutoPilotStep() {
+      if (!autopilotState.isRunning || autopilotState.isPaused) return;
+
+      if (autopilotState.currentIndex >= autopilotState.queue.length) {
+        autopilotState.isRunning = false;
+        setAutopilotUIState('stopped');
+        appendAutoPilotLog(`🎉 ¡Campaña finalizada con éxito! Total enviados: ${autopilotState.queue.length} (🇺🇸 EN: ${autopilotState.countEn}, 🇪🇸 ES: ${autopilotState.countEs}).`);
+        showToast(`🎉 ¡Auto-Pilot finalizado! ${autopilotState.queue.length} correos enviados.`);
+        updateKPIs();
+        renderPipeline();
+        renderAllLeads();
+        return;
+      }
+
+      const lead = autopilotState.queue[autopilotState.currentIndex];
+      const langMode = document.getElementById('autopilot-lang-mode').value;
+      const forcedLang = langMode === 'en' ? 'EN' : (langMode === 'es' ? 'ES' : null);
+      const emailData = generateColdOutreachEmail(lead, forcedLang);
+
+      if (emailData.lang === 'EN') autopilotState.countEn++;
+      else autopilotState.countEs++;
+
+      await sendColdEmailViaService(lead, emailData);
+
+      autopilotState.currentIndex++;
+
+      const total = autopilotState.queue.length;
+      const cur = autopilotState.currentIndex;
+      const pct = Math.round((cur / total) * 100);
+
+      document.getElementById('autopilot-progress-text').textContent = `${pct}% (${cur}/${total})`;
+      document.getElementById('autopilot-progress-bar-fill').style.width = `${pct}%`;
+      document.getElementById('autopilot-count-en').textContent = autopilotState.countEn;
+      document.getElementById('autopilot-count-es').textContent = autopilotState.countEs;
+      document.getElementById('autopilot-count-remaining').textContent = total - cur;
+
+      appendAutoPilotLog(`✉️ [${cur}/${total}] #${lead.id.slice(0,6)} | ${lead.business_name} (${lead.city}, FL) -> ${emailData.lang === 'EN' ? '🇺🇸 EN' : '🇪🇸 ES'} enviado ✅`);
+
+      scheduleNextStep();
+    }
+
+    function scheduleNextStep() {
+      if (!autopilotState.isRunning || autopilotState.isPaused) return;
+      const speed = document.getElementById('autopilot-speed').value;
+      const delayMs = speed === 'fast' ? 800 : 2500;
+      autopilotState.timerId = setTimeout(() => {
+        processAutoPilotStep();
+      }, delayMs);
+    }
+
+    async function sendColdEmailViaService(lead, emailData) {
+      const now = new Date().toISOString();
+      lead.email_count = (lead.email_count || 0) + 1;
+      lead.email_sent_at = now;
+      lead.last_contacted_at = now;
+      lead.contact_status = '📧 Propuesta por Correo';
+      lead.lang = emailData.lang;
+
+      logActivity(lead.id, lead.business_name, 'email', `Auto-Pilot: Correo en frío enviado en ${emailData.lang === 'EN' ? 'Inglés 🇺🇸' : 'Español 🇪🇸'}`);
+      
+      try {
+        await supabaseClient.from('fl_container_leads').update({
+          email_count: lead.email_count,
+          email_sent_at: lead.email_sent_at,
+          last_contacted_at: lead.last_contacted_at,
+          contact_status: lead.contact_status,
+          updated_at: now
+        }).eq('id', lead.id);
+      } catch (err) { console.error(err); }
     }
 
     async function trackEmailSent(id) {
@@ -3134,11 +3763,15 @@ Sitio Web: https://flcontainerchassis.com/es/
         card.ondragend = handleDragEnd;
 
         const timeInfo = getLeadTimeInfo(lead);
+        const lang = detectLeadLanguage(lead);
 
         card.innerHTML = `
           <div class="card-top-row">
             <span class="card-id">#FL-${idx+100}</span>
-            <span class="aging-pill ${timeInfo.badgeClass}">${timeInfo.label}</span>
+            <div style="display:flex;align-items:center;gap:0.3rem;">
+              <span class="lang-pill ${lang === 'EN' ? 'lang-pill-en' : 'lang-pill-es'}" onclick="toggleLeadLang('${lead.id}', event)" title="Clic para alternar idioma">${lang === 'EN' ? '🇺🇸 EN' : '🇪🇸 ES'}</span>
+              <span class="aging-pill ${timeInfo.badgeClass}">${timeInfo.label}</span>
+            </div>
           </div>
           <span class="source-tag">🏷️ ${lead.source || 'Google Maps'}</span>
           <div class="card-business-name">${lead.business_name}</div>
